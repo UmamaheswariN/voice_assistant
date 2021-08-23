@@ -70,15 +70,6 @@ def run_alexa():
         talk('playing' + song)
         pywhatkit.playonyt(song)  # to play command from youtube
         print('playing')
-    elif 'email' in command:
-        text = format(command)
-        receiver = 'muma@gocontec.com'
-        message = text
-        print(text)
-        sender = yagmail.SMTP(user='muma@gocontec.com', password='ukrenee@102013', host='smtp.office365.com',
-                              port=587, smtp_starttls=True, smtp_ssl=False)
-        sender.send(to=receiver, subject='this is an automated mail', contents=message)
-        print('sent mail')
     elif 'time' in command:
         time = datetime.datetime.now().strftime('%I:%M %p')
         talk('Current time is' + time)  # to get time
