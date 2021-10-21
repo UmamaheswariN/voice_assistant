@@ -23,12 +23,16 @@ from tkinter.ttk import *
 import tkinter.messagebox
 from tkinter import LEFT, RIGHT, TOP, BOTTOM, CENTER
 from tkinter.font import Font
+from tkinter import *
+from tkinter.ttk import *
 
 obj = tk.Tk()
 obj.title("Contec Voice Assistant")
-obj.geometry('500x300')
+obj.geometry('505x305')
 obj.resizable(True, True)
 obj.config(bg='yellow')
+
+
 
 import playsound
 
@@ -39,7 +43,7 @@ engine = pyttsx3.init()  # used to talk
 voices = engine.getProperty('voices')
 # setter method .[0]=male voice and
 # [1]=female voice in set Property.
-engine.setProperty('voice', voices[1].id)
+engine.setProperty('voice', voices[0].id)
 
 
 def talk(command):
@@ -64,7 +68,7 @@ def wishMe():
     assname = ("R 1 point 0")
     talk("Loading your personal assistant")
     talk(assname)
-    #talk("Tell me how can I help you?")
+    # talk("Tell me how can I help you?")
 
 
 def talk_command():
@@ -81,7 +85,6 @@ def talk_command():
             voice = listener.listen(source)
             print('Done recording')
             command = listener.recognize_google(voice)  # Using google to recognize audio
-
             command = command.lower()
     except:
         talk("Pardon me, please say that again")
@@ -98,7 +101,7 @@ def listen_command():
             # adjust the energy threshold based on
             # the surrounding noise level
             listener.adjust_for_ambient_noise(source, duration=0.2)
-            talk('Ask me anything..')
+            talk('Tell me how can I help you?..')
             voice = listener.listen(source)
             print('Done recording')
             command = listener.recognize_google(voice)  # Using google to recognize audio
@@ -154,28 +157,30 @@ def run_alexa():
         power = r"C:\Users\muma\Desktop\Python_Learning_stuffs\Our Own Virtual Assistant.pptx"
         os.startfile(power)
         # file = "demo_audio_test.m4a"
-        file = "my_audio_presentation_final.m4a"
-        os.startfile(file)
-        time.sleep(105)
+        # file = "my_audio_presentation_final.m4a"
+        # os.startfile(file)
+        sys.exit()
+        # time.sleep(105)
 
     elif "write a note" in command:
-        talk("Am ready to write...")
+        talk("ready to take notes...")
         note = talk_command()
         file = open('demotext.txt', 'w')
-        talk("Should i include date and time")
-        snfm = talk_command()
-        if 'yes' in snfm or 'sure' in snfm:
-            strTime = datetime.datetime.now().strftime('%I:%M %p')
-            file.write(strTime)
-            file.write(" :- ")
-            file.write(note)
-        else:
-            file.write(note)
-        talk("The text file ready now")
+        file.write(note)
+        talk("The text file ready now with your notes")
+        # snfm = talk_command()
+        # if 'yes' in snfm or 'sure' in snfm:
+        # strTime = datetime.datetime.now().strftime('%I:%M %p')
+        # file.write(strTime)
+        # file.write(" :- ")
+        # file.write(note)
+        # else:
+        # file.write(note)
+        # talk("The text file ready now")
 
-    elif "show note" in command:
-        talk("Showing Notes")
-        file = open("demonote.txt", "r")
+    elif "open note" in command:
+        talk("Opening Notes")
+        file = open("demotext.txt", "r")
         print(file.read())
         talk(file.read(6))
 
@@ -209,6 +214,11 @@ def run_alexa():
     elif 'open google' in command:
         webbrowser.open_new_tab("https://www.google.com")
         talk("Google chrome is open now")
+        time.sleep(5)
+
+    elif 'company' in command:
+        webbrowser.open_new_tab("https://www.gocontec.com/")
+        talk("Your company website is open now")
         time.sleep(5)
 
     elif 'open gmail' in command:
@@ -365,7 +375,7 @@ def run_alexa():
         print(*a[1:5], sep=',')
 
     else:
-        #talk('Please repeat again.')
+        # talk('Please repeat again.')
         return 0
 
 
@@ -392,25 +402,25 @@ if __name__ == '__main__':
     fontStyle = Font(family="Lucida Grande", size=20)
 
     btn = tk.Button(text="Speak With R-1.0", width=15,
-                    height=2, font=fontStyle,
+                    height=1, font=fontStyle,
                     compound=LEFT, command=startspeakeithme)
-    # btn.place(x=20, y=50)
-    btn.grid(row=1, column=3, padx=100)
-    btn.config(bg="green")
+    btn.place(x=120, y=20)
+    # btn.grid(row=1, column=2, padx=20)
+    btn.config(bg="green", foreground='white')
 
-    btn1 = tk.Button(text="Stop", width=15,
-                     height=2, font=fontStyle,
-                     compound=CENTER, command=stopspeacking)
+    btn1 = tk.Button(text="Stop", width=10,
+                     height=1, font=fontStyle,
+                     compound=LEFT, command=stopspeacking)
 
-    # btn1.place(x=250, y=50)
-    btn1.grid(row=1, column=5, padx=100)
+    btn1.place(x=10, y=230)
+    # btn1.grid(row=2, column=1, padx=10)
     btn1.config(bg="yellow")
 
-    btn2 = tk.Button(text='Quit !', width=15,
-                     height=2, font=fontStyle,
-                     compound=RIGHT, command=obj.destroy)
-    # btn2.place(x=700, y=50)
-    btn2.grid(row=1, column=8, padx=100)
+    btn2 = tk.Button(text='Quit !', width=10,
+                     height=1, font=fontStyle,
+                     compound=LEFT, command=obj.destroy)
+    btn2.place(x=325, y=230)
+    # btn2.grid(row=2, column=3, padx=5)
     btn2.config(bg="red")
 
     obj.mainloop()
