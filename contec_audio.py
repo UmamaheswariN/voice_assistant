@@ -12,6 +12,7 @@ import sys  # to get exit
 import imdb  # to get any movie details
 from PIL import ImageTk
 import osascript
+import requests, json
 
 from weather import *
 import re
@@ -31,8 +32,6 @@ obj.title("Contec Voice Assistant")
 obj.geometry('505x305')
 obj.resizable(True, True)
 obj.config(bg='yellow')
-
-
 
 import playsound
 
@@ -82,6 +81,7 @@ def talk_command():
             # the surrounding noise level
             listener.adjust_for_ambient_noise(source, duration=0.5)
             # talk('Ask me anything')
+            print('Listening')
             voice = listener.listen(source)
             print('Done recording')
             command = listener.recognize_google(voice)  # Using google to recognize audio
@@ -152,6 +152,74 @@ def run_alexa():
         print(command)
         open_page("https://twitter.com/" + get_twitter_profile(command))
 
+    elif 'bench request' in command or 'issue' in command or 'create ticket' in command:
+        talk("Happy to assist you! Can you tell your name")
+        requesterName = talk_command()
+        print(requesterName)
+        if 'None' in requesterName:
+            talk("Pardon! Can you tell your name again")
+            requesterName = talk_command()
+            print(requesterName)
+        else:
+            talk("Can you tell your stationName ")
+            stationName = talk_command()
+            print(stationName)
+            if 'None' in stationName:
+                talk("Pardon! Can you tell your stationName again")
+                stationName = talk_command()
+                print(stationName)
+            else:
+                talk("Can you describe issue")
+                reqIssueDescription = talk_command()
+                print(reqIssueDescription)
+                if 'None' in reqIssueDescription:
+                    talk("Pardon! Can you tell your email again")
+                    reqIssueDescription = talk_command()
+                    print(reqIssueDescription)
+                else:
+                    if 'None' in requesterName or 'None' in stationName or 'None' in reqIssueDescription:
+                        talk("Pardon! The request not created due to invalid values.Please repeat")
+                    else:
+                        talk('I am confirming the details as you given')
+                        talk('your name')
+                        talk(requesterName)
+                        talk('your station name')
+                        talk(stationName)
+                        talk('your issue description')
+                        talk(reqIssueDescription)
+                        talk('All these details are okay? Shall i proceed to create? please confirm yes or no')
+                        confirmCreateRequest = talk_command()
+                        if 'yes' in confirmCreateRequest or 's' in confirmCreateRequest or 'z' in confirmCreateRequest:
+                            print('BenchRequest Service..')
+                            benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                            benchData = {"id": 0, "requestorId": 0, "requesterName": requesterName,
+                                         "stationId": 0, "stationName": stationName, "siteId": 1004, "statusId": 3,
+                                         "categoryId": 1, "subcategoryId": 1, "assigneeId": 7668, "priority": 0,
+                                         "repairAction1Id": 0, "repairAction2Id": 0, "repairAction3Id": 0,
+                                         "diagnosisId": 0,
+                                         "sBUId": 1, "systemId": 0, "description": reqIssueDescription,
+                                         "comments": "test", "userId": 0, "requesterEmail": '',
+                                         "supervisorId": 7687, "email": '',
+                                         "supervisorName": "CiscoSupervisor", "userfor": "requester",
+                                         "status": "Assigned",
+                                         "docs": ""}
+                            print(benchData)
+
+                            headers = {'Content-type': 'application/json'}
+                            print('BenchRequest Service call in progress..')
+                            # responeData = requests.put(benchReqUrl, json={'json_payload': data}, headers=headers)
+                            responeData = requests.put(benchReqUrl, headers=headers, data=json.dumps(benchData))
+                            print(responeData.json())
+                            print(responeData)
+                            if '<Response [200]>' in responeData:
+                                talk('Successfully created your ticket in Bench request. Thanks for using R1.0')
+                                stopspeacking()
+                            else:
+                                talk('Thanks for using R1.0')
+                                stopspeacking()
+                        elif 'no' in confirmCreateRequest:
+                            talk('This issue will not create without your confirmation.')
+                            stopspeacking()
     elif 'powerpoint' in command or 'presentation' in command:
         talk("opening Power Point presentation")
         power = r"C:\Users\muma\Desktop\Python_Learning_stuffs\Our Own Virtual Assistant.pptx"
