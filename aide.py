@@ -518,8 +518,8 @@ if __name__ == '__main__':
     button_2.place(
         x=23.0,
         y=10.0,
-        width=140.0,
-        height=113.0
+        width=108.0,
+        height=103.0
     )
 
     button_image_3 = PhotoImage(
@@ -537,9 +537,9 @@ if __name__ == '__main__':
         width=145.0,
         height=50.0
     )
-    img = tk.Image("photo", file=getCorrectPath("assets/icn.png"))
+    img = tk.Image("photo", file=getCorrectPath("assets/inc.png"))
     obj.tk.call('wm','iconphoto',obj._w, img)
-
+    #obj.config(menu="")
     obj.mainloop()
 
 # wishMe()
