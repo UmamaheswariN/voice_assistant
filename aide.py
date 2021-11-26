@@ -30,7 +30,7 @@ from tkinter.ttk import *
 obj = tk.Tk()
 obj.title("Contec Voice Assistant")
 obj.geometry('800x500')
-obj.resizable(True, True)
+obj.resizable(False, False)
 obj.config(bg='')
 
 import playsound
@@ -48,6 +48,7 @@ engine.setProperty('voice', voices[1].id)
 def getCorrectPath(relative_path):
     p = os.path.abspath(".").replace('/dist', "")
     return os.path.join(p, relative_path)
+
 
 def talk(command):
     # Method for the speaking of the the assistant
@@ -177,7 +178,7 @@ def run_alexa():
                 reqIssueDescription = talk_command()
                 print(reqIssueDescription)
                 if 'None' in reqIssueDescription:
-                    talk("Pardon! Can you tell your email again")
+                    talk("Pardon! Can you describe the issue once again")
                     reqIssueDescription = talk_command()
                     print(reqIssueDescription)
                 else:
@@ -466,29 +467,25 @@ def stopspeacking():
 #   subprocess.call(["sleep", "/l"])
 
 if __name__ == '__main__':
-
-
     canvas = Canvas(
         obj,
-        bg = "#E7EBEE",
-        height = 500,
-        width = 800,
-        bd = 0,
-        highlightthickness = 0,
-        relief = "ridge"
+        bg="#E7EBEE",
+        height=500,
+        width=800,
+        bd=0,
+        highlightthickness=0,
+        relief="ridge"
     )
 
+    canvas.place(x=0, y=0)
 
+    bg = PhotoImage(file=getCorrectPath("assets/bga.png"))
 
-    canvas.place(x = 0, y = 0) 
+    canvas.pack(fill="both", expand=True)
 
-    bg = PhotoImage(file = getCorrectPath("assets/bga.png"))
-    
-    canvas.pack(fill = "both", expand = True)
-    
     # Display image
-    canvas.create_image( 0, 0, image = bg, 
-                        anchor = "nw")
+    canvas.create_image(0, 0, image=bg,
+                        anchor="nw")
 
     button_image_1 = PhotoImage(
         file=getCorrectPath("assets/mic.png"))
@@ -528,7 +525,7 @@ if __name__ == '__main__':
         image=button_image_3,
         borderwidth=0,
         highlightthickness=0,
-        command=obj.destroy,
+        command=stopspeacking,
         relief="flat", cursor="hand1"
     )
     button_3.place(
@@ -538,8 +535,8 @@ if __name__ == '__main__':
         height=50.0
     )
     img = tk.Image("photo", file=getCorrectPath("assets/inc.png"))
-    obj.tk.call('wm','iconphoto',obj._w, img)
-    #obj.config(menu="")
+    obj.tk.call('wm', 'iconphoto', obj._w, img)
+    # obj.config(menu="")
     obj.mainloop()
 
 # wishMe()

@@ -152,6 +152,25 @@ def run_alexa():
         print(command)
         open_page("https://twitter.com/" + get_twitter_profile(command))
 
+    elif 'fedex' in command or 'tracking' in command or  'package' in command or 'destination' in command:
+        talk("Happy to assist you in tracking your package. Can you provide tracking id")
+        trackingID = talk_command()
+        talk(trackingID)
+        talk('Checking the package recent location')
+        # open_page("https://www.trackingmore.com/fedex-tracking.html?number="+trackingID)
+
+        url = "https://apis-sandbox.fedex.com/track/v1/associatedshipments"
+
+        payload = {"trackingNumber": "128667043726"}  # 'input' refers to JSON Payload
+        headers = {
+            'Content-Type': "application/json",
+            'X-locale': "en_US",
+            'Authorization': "Bearer "
+        }
+        response = requests.request("POST", url, data=payload, headers=headers)
+        print(response.text)
+
+
     elif 'bench request' in command or 'issue' in command or 'create ticket' in command:
         talk("Happy to assist you! Can you tell your name")
         requesterName = talk_command()
