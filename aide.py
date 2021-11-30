@@ -72,7 +72,32 @@ def wishMe():
     assname = ("R 1 point 0")
     talk("Loading your personal assistant")
     talk(assname)
+    talk("confirm your Language by mentioning as follows. English,  Spanish, Tamil, Hindi")
     # talk("Tell me how can I help you?")
+
+
+def choose_language():
+    global command
+    try:
+        # use the microphone as source for input.
+        with sr.Microphone() as source:
+            print("Clearing background noises...Please wait")
+            # wait for a second to let the recognizer
+            # adjust the energy threshold based on
+            # the surrounding noise level
+            listener.adjust_for_ambient_noise(source, duration=0.5)
+            # talk('Ask me anything')
+            print('Listening')
+            voice = listener.listen(source)
+            print('Done recording')
+            print(voice)
+            langCommand = listener.recognize_google(voice)  # Using google to recognize audio
+            langCommand = langCommand.lower()
+            print(langCommand)
+            return langCommand
+    except:
+        talk("Pardon me, please say that again")
+        return "None"
 
 
 def talk_command():
@@ -89,6 +114,7 @@ def talk_command():
             print('Listening')
             voice = listener.listen(source)
             print('Done recording')
+            print(voice)
             command = listener.recognize_google(voice)  # Using google to recognize audio
             command = command.lower()
     except:
@@ -110,6 +136,91 @@ def listen_command():
             voice = listener.listen(source)
             print('Done recording')
             command = listener.recognize_google(voice)  # Using google to recognize audio
+            command = command.lower()
+            if 'R 1 point 0' in command:
+                command = command.replace('R 1 point 0', '')
+            if "good bye" in command or "ok bye" in command or "bye" in command:
+                talk('your personal assistant R-one is shutting down,Good bye')
+                print('your personal assistant R-one is shutting down,Good bye')
+                time.sleep(30)
+                sys.exit()
+    except:
+        talk("Pardon me, please say that again")
+        return "None"
+    return command
+
+
+def listen_command_spanish():
+    global command
+    try:
+        with sr.Microphone() as source:
+            print("Clearing background noises...Please wait")
+            # wait for a second to let the recognizer
+            # adjust the energy threshold based on
+            # the surrounding noise level
+            listener.adjust_for_ambient_noise(source, duration=0.2)
+            talk('Dime cómo puedo ayudarte?')
+            talk('Dime cómo puedo ayudarte?')
+            print('Dime cómo puedo ayudarte?')
+            voice = listener.listen(source)
+            print('Done recording')
+            command = listener.recognize_google(voice, language="es-MX")  # Using google to recognize audio
+            command = command.lower()
+            if 'R 1 point 0' in command:
+                command = command.replace('R 1 point 0', '')
+            if "good bye" in command or "ok bye" in command or "bye" in command:
+                talk('your personal assistant R-one is shutting down,Good bye')
+                print('your personal assistant R-one is shutting down,Good bye')
+                time.sleep(30)
+                sys.exit()
+    except:
+        talk("Pardon me, please say that again")
+        return "None"
+    return command
+
+
+def listen_command_tamil():
+    global command
+    try:
+        with sr.Microphone() as source:
+            print("Clearing background noises...Please wait")
+            # wait for a second to let the recognizer
+            # adjust the energy threshold based on
+            # the surrounding noise level
+            listener.adjust_for_ambient_noise(source, duration=0.2)
+            print('நான் உங்களுக்கு எப்படி உதவ முடியும் என்று சொல்லுங்கள்?')
+            voice = listener.listen(source)
+            talk('நான் உங்களுக்கு எப்படி உதவ முடியும் என்று சொல்லுங்கள்?')
+            voice = 'நான் உங்களுக்கு எப்படி உதவ முடியும் என்று சொல்லுங்கள்?'
+            print('Done recording')
+            command = listener.recognize_google(voice, language='ta-IN')  # Using google to recognize audio
+            command = command.lower()
+            if 'R 1 point 0' in command:
+                command = command.replace('R 1 point 0', '')
+            if "good bye" in command or "ok bye" in command or "bye" in command:
+                talk('your personal assistant R-one is shutting down,Good bye')
+                print('your personal assistant R-one is shutting down,Good bye')
+                time.sleep(30)
+                sys.exit()
+    except:
+        talk("Pardon me, please say that again")
+        return "None"
+    return command
+
+
+def listen_command_hindi():
+    global command
+    try:
+        with sr.Microphone() as source:
+            print("Clearing background noises...Please wait")
+            # wait for a second to let the recognizer
+            # adjust the energy threshold based on
+            # the surrounding noise level
+            listener.adjust_for_ambient_noise(source, duration=0.2)
+            talk('mujhe batao main tumhaaree kaise madad kar sakata hoon?')
+            voice = listener.listen(source)
+            print('Done recording')
+            command = listener.recognize_google(voice, language='hi-IN')  # Using google to recognize audio
             command = command.lower()
             if 'R 1 point 0' in command:
                 command = command.replace('R 1 point 0', '')
@@ -146,8 +257,26 @@ def get_twitter_profile(recognized_text):
     return matches[0]
 
 
-def run_alexa():
-    command = listen_command()
+def run_alexa(choosenLangcode):
+    global command
+    print(choosenLangcode)
+    talk(choosenLangcode)
+    if 'english' in choosenLangcode:
+        print('am in english')
+        command = listen_command()
+    elif 'spanish' in choosenLangcode:
+        print('am in spanish')
+        command = listen_command_spanish()
+    elif 'tamil' in choosenLangcode:
+        print('am in tamil')
+        command = listen_command_tamil()
+    elif 'hindi' in choosenLangcode:
+        print('am in hindi')
+        command = listen_command_hindi()
+    else:
+        print('am in default language')
+        command = listen_command()
+
     print(command)
     if is_weather_search_action(command):
         print(command)
@@ -225,6 +354,81 @@ def run_alexa():
                         elif 'no' in confirmCreateRequest:
                             talk('This issue will not create without your confirmation.')
                             stopspeacking()
+
+    elif 'solicitud de banco' in command or 'asunto' in command:
+        print('going to ask ur name in spanish')
+        talk("Feliz de ayudarte! Puedes decir tu nombre")
+        print('Feliz de ayudarte! Puedes decir tu nombre')
+        requesterName = talk_command()
+        print(requesterName)
+        if 'None' in requesterName:
+            talk("¡Perdón! ¿Puedes decir tu nombre de nuevo?")
+            requesterName = talk_command()
+            print(requesterName)
+        else:
+            print('going to ask ur stationName in spanish')
+            talk("Puedes decir el nombre de tu estación? ")
+            print('Feliz de ayudarte! Puedes decir tu nombre')
+            stationName = talk_command()
+            print(stationName)
+            if 'None' in stationName:
+                talk("Perdón! Puedes decir el nombre de tu estación?")
+                stationName = talk_command()
+                print(stationName)
+            else:
+                talk("¿Puedes describir el problema?")
+                reqIssueDescription = talk_command()
+                print(reqIssueDescription)
+                if 'None' in reqIssueDescription:
+                    talk("Perdón! ¿Puedes describir el problema?")
+                    reqIssueDescription = talk_command()
+                    print(reqIssueDescription)
+                else:
+                    if 'None' in requesterName or 'None' in stationName or 'None' in reqIssueDescription:
+                        talk("Pardon! The request not created due to invalid values.Please repeat")
+                    else:
+                        talk('I am confirming the details as you given')
+                        talk('your name')
+                        talk(requesterName)
+                        talk('your station name')
+                        talk(stationName)
+                        talk('your issue description')
+                        talk(reqIssueDescription)
+                        talk('All these details are okay? Shall i proceed to create? please confirm yes or no')
+                        confirmCreateRequest = talk_command()
+                        if 'sí' in confirmCreateRequest or 'se' in confirmCreateRequest or 'z' in confirmCreateRequest:
+                            print('BenchRequest Service..')
+                            benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                            benchData = {"id": 0, "requestorId": 0, "requesterName": requesterName,
+                                         "stationId": 0, "stationName": stationName, "siteId": 1004, "statusId": 3,
+                                         "categoryId": 1, "subcategoryId": 1, "assigneeId": 7668, "priority": 0,
+                                         "repairAction1Id": 0, "repairAction2Id": 0, "repairAction3Id": 0,
+                                         "diagnosisId": 0,
+                                         "sBUId": 1, "systemId": 0, "description": reqIssueDescription,
+                                         "comments": "test", "userId": 0, "requesterEmail": '',
+                                         "supervisorId": 7687, "email": '',
+                                         "supervisorName": "CiscoSupervisor", "userfor": "requester",
+                                         "status": "Assigned",
+                                         "docs": ""}
+                            print(benchData)
+
+                            headers = {'Content-type': 'application/json'}
+                            print('BenchRequest Service call in progress..')
+                            # responeData = requests.put(benchReqUrl, json={'json_payload': data}, headers=headers)
+                            responeData = requests.put(benchReqUrl, headers=headers, data=json.dumps(benchData))
+                            print(responeData.json())
+                            print(responeData)
+                            if '<Response [200]>' in responeData:
+                                talk('Successfully created your ticket in Bench request. Thanks for using R1.0')
+                                stopspeacking()
+                            else:
+                                talk('Thanks for using R1.0')
+                                stopspeacking()
+                        elif 'no' in confirmCreateRequest:
+                            talk('This issue will not create without your confirmation.')
+                            stopspeacking()
+
+
     elif 'powerpoint' in command or 'presentation' in command:
         talk("opening Power Point presentation")
         power = r"C:\Users\muma\Desktop\Python_Learning_stuffs\Our Own Virtual Assistant.pptx"
@@ -454,9 +658,11 @@ def run_alexa():
 
 def startspeakeithme():
     wishMe()
+    choosenLangcode = choose_language()
+    talk(choosenLangcode)
     # time.sleep()
     while True:
-        run_alexa()
+        run_alexa(choosenLangcode)
 
 
 def stopspeacking():
