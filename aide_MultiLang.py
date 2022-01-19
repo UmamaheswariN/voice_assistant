@@ -107,10 +107,11 @@ def choose_language():
         # talk("Pardon me, please say that again")
         audio_string = "Pardon me, please continue from again"
         print(audio_string)
-        destini_lang = convert_language(audio_string, choosenLangCode)
-        print('translated text')
-        print(destini_lang)
-        return destini_lang
+        startspeakeithme()
+        #destini_lang = convert_language(audio_string, choosenLangCode)
+        #print('translated text')
+        #print(destini_lang)
+        #return destini_lang
         # return "None"
 
 
@@ -134,7 +135,7 @@ def talk_command():
                 command = listener.recognize_google(voice, language="es-MX")  # Using google to recognize audio
             elif "french" in choosenLangCode:
                 command = listener.recognize_google(voice, language="fr-CA")  # Using google to recognize audio
-            elif "tamil" in choosenLangCode:
+            elif "tamil" in choosenLangCode or "Tamil" in choosenLangCode:
                 command = listener.recognize_google(voice, language="ta-IN")  # Using google to recognize audio
             elif "hindi" in choosenLangCode:
                 command = listener.recognize_google(voice, language="hi-IN")  # Using google to recognize audio
@@ -504,9 +505,7 @@ def run_alexa(choosenLangCode):
             print(destini_lang0)
             requesterName = multi_talk_command_tamil()
             print(requesterName)
-            command_reqname = listener.recognize_google(requesterName,
-                                                        language="en-US")  # Using google to recognize audio
-            command_reqname = command_reqname.lower()
+            command_reqname = convert_language(requesterName, "english")  # Using google to recognize audio
             print(command_reqname)
             if 'இல்லை' in requesterName:
                 audio_string1 = "Pardon! Can you tell your name again"
@@ -516,8 +515,7 @@ def run_alexa(choosenLangCode):
                 talk(destini_lang110)
                 requesterName = multi_talk_command_tamil()
                 print(requesterName)
-                command_reqname = listener.recognize_google(requesterName, language="en-US")  # Using google to recognize audio
-                command_reqname = command_reqname.lower()
+                command_reqname = convert_language(requesterName, "english")  # Using google to recognize audio
                 print(command_reqname)
             else:
                 audio_string2 = "Can you tell your stationName"
@@ -527,9 +525,7 @@ def run_alexa(choosenLangCode):
                 talk(destini_lang2)
                 stationName = multi_talk_command_tamil()
                 print(stationName)
-                command_stnname = listener.recognize_google(stationName,
-                                                            language="en-US")  # Using google to recognize audio
-                command_stnname = command_stnname.lower()
+                command_stnname = convert_language(stationName, "english")  # Using google to recognize audio
                 print(command_stnname)
                 if 'இல்லை' in stationName:
                     audio_string3 = "Pardon! Can you tell your stationName again"
@@ -539,9 +535,7 @@ def run_alexa(choosenLangCode):
                     talk(destini_lang3)
                     stationName = multi_talk_command_tamil()
                     print(stationName)
-                    command_stnname = listener.recognize_google(stationName,
-                                                                language="en-US")  # Using google to recognize audio
-                    command_stnname = command_stnname.lower()
+                    command_stnname = convert_language(stationName, "english") # Using google to recognize audio
                     print(command_stnname)
                 else:
                     audio_string4 = "Can you describe issue"
@@ -551,9 +545,7 @@ def run_alexa(choosenLangCode):
                     # talk(destini_lang4)
                     reqIssueDescription = multi_talk_command_tamil()
                     print(reqIssueDescription)
-                    command_descname = listener.recognize_google(reqIssueDescription,
-                                                                language="en-US")  # Using google to recognize audio
-                    command_descname = command_descname.lower()
+                    command_descname = convert_language(reqIssueDescription, "english") # Using google to recognize audio
                     print(command_descname)
                     if 'இல்லை' in reqIssueDescription:
                         audio_string5 = "Pardon! Can you describe the issue once again"
@@ -563,9 +555,7 @@ def run_alexa(choosenLangCode):
                         # talk(destini_lang5)
                         reqIssueDescription = multi_talk_command_tamil()
                         print(reqIssueDescription)
-                        command_descname = listener.recognize_google(reqIssueDescription,
-                                                                     language="en-US")  # Using google to recognize audio
-                        command_descname = command_descname.lower()
+                        command_descname = convert_language(reqIssueDescription, "english")  # Using google to recognize audio
                         print(command_descname)
                     else:
                         if 'இல்லை' in reqIssueDescription or 'இல்லை' in stationName or 'இல்லை' in requesterName:
@@ -992,7 +982,7 @@ def convert_language(audio_string, language_code):
             print('am i here in tamil block?')
             translate_text = translator.translate(audio_string, dest='ta')
             print(translate_text)
-            tts = gt.gTTS(text=translate_text.text, lang="ta")
+            tts = gt.gTTS(text=translate_text.text, lang="ta",slow=False )
             basename = "tamilaudio"
             suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
             filename = "_".join([basename, suffix])  # e.g. 'mylogfile_120508_171442'
@@ -1002,7 +992,7 @@ def convert_language(audio_string, language_code):
             time.sleep(8)
         elif 'hindi' in language_code:
             translate_text = translator.translate(audio_string, dest='hi')
-            tts = gt.gTTS(text=translate_text.text, lang="hi")
+            tts = gt.gTTS(text=translate_text.text, lang="hi",slow=False)
             basename = "hindiaudio"
             suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
             filename = "_".join([basename, suffix])  # e.g. 'mylogfile_120508_171442'
@@ -1018,6 +1008,8 @@ def convert_language(audio_string, language_code):
 def startspeakeithme():
     wishMe()
     choosenLangcode = choose_language()
+    choosenLangcode = choosenLangcode.lower()
+    print(choosenLangcode)
     if "spanish" in choosenLangcode or "french" in choosenLangcode or "tamil" in choosenLangcode or "hindi" in choosenLangcode or "english" in choosenLangcode:
         print(choosenLangcode)
     else:
