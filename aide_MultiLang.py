@@ -13,7 +13,7 @@ import imdb  # to get any movie details
 from PIL import ImageTk
 import osascript
 import requests, json
-
+import gtts as gt
 from weather import *
 import re
 from util import *
@@ -44,10 +44,6 @@ translator = Translator()
 
 listener = sr.Recognizer()  # initialization
 engine = pyttsx3.init()  # used to talk
-voices = engine.getProperty('voices')
-# setter method .[0]=male voice and
-# [1]=female voice in set Property.
-engine.setProperty('voice', voices[1].id)
 
 
 def getCorrectPath(relative_path):
@@ -56,8 +52,15 @@ def getCorrectPath(relative_path):
 
 
 def talk(command):
+    engine = pyttsx3.init()  # used to talk
+    voices = engine.getProperty('voices')
+    # setter method .[0]=male voice and
+    # [1]=female voice in set Property.
+    engine.setProperty('voice', voices[1].id)
     # Method for the speaking of the the assistant
     engine.say(command)
+    engine.setProperty('rate', 200)
+    engine.setProperty('volume', 0.9)
     # Blocks while processing all the currently
     # queued commands
     engine.runAndWait()
@@ -101,8 +104,14 @@ def choose_language():
             print(listener.recognize_google(voice))
             return langCommand
     except:
-        talk("Pardon me, please say that again")
-        return "None"
+        # talk("Pardon me, please say that again")
+        audio_string = "Pardon me, please continue from again"
+        print(audio_string)
+        destini_lang = convert_language(audio_string, choosenLangCode)
+        print('translated text')
+        print(destini_lang)
+        return destini_lang
+        # return "None"
 
 
 def talk_command():
@@ -121,12 +130,112 @@ def talk_command():
             print('Done recording')
             print(voice)
             command = listener.recognize_google(voice)  # Using google to recognize audio
+            if "spanish" in choosenLangCode:
+                command = listener.recognize_google(voice, language="es-MX")  # Using google to recognize audio
+            elif "french" in choosenLangCode:
+                command = listener.recognize_google(voice, language="fr-CA")  # Using google to recognize audio
+            elif "tamil" in choosenLangCode:
+                command = listener.recognize_google(voice, language="ta-IN")  # Using google to recognize audio
+            elif "hindi" in choosenLangCode:
+                command = listener.recognize_google(voice, language="hi-IN")  # Using google to recognize audio
+            else:
+                command = listener.recognize_google(voice)  # Using google to recognize audio
+                # command = listener.recognize_google(voice, language="en-US")  # Using google to recognize audio
             command = command.lower()
+            return command
     except:
-        talk("Pardon me, please say that again")
+        # talk("Pardon me, please say that again")
+        audio_string = "Pardon me, please say that again"
+        print(audio_string)
+        #destini_lang = convert_language(audio_string)
+        #print('translated text')
+        #print(destini_lang)
+        talk(audio_string)
+        run_alexa(choosenLangCode)
         return "None"
-    return command
 
+
+def multi_talk_command():
+    global command
+    try:
+        # use the microphone as source for input.
+        with sr.Microphone() as source:
+            print("Clearing background noises...Please wait")
+            # wait for a second to let the recognizer
+            # adjust the energy threshold based on
+            # the surrounding noise level
+            listener.adjust_for_ambient_noise(source, duration=0.5)
+            # talk('Ask me anything')
+            print('Listening')
+            voice = listener.listen(source)
+            print('Done recording')
+            print(voice)
+            command = listener.recognize_google(voice, language="en-US")  # Using google to recognize audio
+            """
+            if "spanish" in choosenLangCode:
+                command = listener.recognize_google(voice, language="es-MX")  # Using google to recognize audio
+            elif "french" in choosenLangCode:
+                command = listener.recognize_google(voice, language="fr-CA")  # Using google to recognize audio
+            elif "tamil" in choosenLangCode:
+                command = listener.recognize_google(voice, language="ta-IN")  # Using google to recognize audio
+            elif "hindi" in choosenLangCode:
+                command = listener.recognize_google(voice, language="hi-IN")  # Using google to recognize audio
+            else:
+            """
+            # command = listener.recognize_google(voice)  # Using google to recognize audio
+            # command = listener.recognize_google(voice, language="en-US")  # Using google to recognize audio
+            command = command.lower()
+            return command
+    except:
+        # talk("Pardon me, please say that again")
+        audio_string = "Pardon me, please say that again"
+        print(audio_string)
+        # destini_lang = convert_language(audio_string, choosenLangCode)
+        # print('translated text')
+        talk(audio_string)
+        multi_talk_command()
+        # return "None"
+
+def multi_talk_command_tamil():
+    global command
+    try:
+        # use the microphone as source for input.
+        with sr.Microphone() as source:
+            print("Clearing background noises...Please wait")
+            # wait for a second to let the recognizer
+            # adjust the energy threshold based on
+            # the surrounding noise level
+            listener.adjust_for_ambient_noise(source, duration=0.5)
+            # talk('Ask me anything')
+            print('Listening')
+            voice = listener.listen(source)
+            print('Done recording')
+            print(voice)
+            command = listener.recognize_google(voice,  language="ta-IN")  # Using google to recognize audio
+            """
+            if "spanish" in choosenLangCode:
+                command = listener.recognize_google(voice, language="es-MX")  # Using google to recognize audio
+            elif "french" in choosenLangCode:
+                command = listener.recognize_google(voice, language="fr-CA")  # Using google to recognize audio
+            elif "tamil" in choosenLangCode:
+                command = listener.recognize_google(voice, language="ta-IN")  # Using google to recognize audio
+            elif "hindi" in choosenLangCode:
+                command = listener.recognize_google(voice, language="hi-IN")  # Using google to recognize audio
+            else:
+            """
+            # command = listener.recognize_google(voice)  # Using google to recognize audio
+            # command = listener.recognize_google(voice, language="en-US")  # Using google to recognize audio
+            # command = command.lower()
+            return command
+    except:
+        # talk("Pardon me, please say that again")
+        audio_string = "Pardon me, please say that again"
+        print(audio_string)
+        # destini_lang = convert_language(audio_string, choosenLangCode)
+        # print('translated text')
+        talk(audio_string)
+        multi_talk_command()
+        # return "None"
 
 def listen_command(choosenLangCode):
     global command
@@ -141,6 +250,7 @@ def listen_command(choosenLangCode):
             audio_string = "Tell me how can I help you?"
             print(audio_string)
             destini_lang = convert_language(audio_string, choosenLangCode)
+            print('translated text')
             print(destini_lang)
             talk(destini_lang)
             print('listening...')
@@ -165,10 +275,17 @@ def listen_command(choosenLangCode):
                 print('your personal assistant R-one is shutting down,Good bye')
                 time.sleep(30)
                 sys.exit()
+        return command
     except:
-        talk("Pardon me, please say that again")
+        # talk("Pardon me, please say that again")
+        audio_string = "Pardon me, please say that again"
+        print(audio_string)
+        destini_lang = convert_language(audio_string, choosenLangCode)
+        print('translated text')
+        print(destini_lang)
+        talk(destini_lang)
+        run_alexa(choosenLangCode)
         return "None"
-    return command
 
 
 def is_weather_search_action(recognized_text):
@@ -184,140 +301,537 @@ def extract_city_name_for_weather_action(recognized_text):
 def run_alexa(choosenLangCode):
     global command
     command = listen_command(choosenLangCode)
-    print(command)
 
     if is_weather_search_action(command):
         print(command)
         talk(WeatherService().get_weather_data(extract_city_name_for_weather_action(command)))
+        # museebat or anurodh banaen hindi prounciation
+        # problema spanish prounciation
+        # problème french
 
     elif there_exists(["bench request", "issue", "create ticket", "solicitud de banco", "asunto", "asanthu", "assunto",
-                       "Crear Ticket", "problème", "problem", "demande de banc", "créer un billet"]):
+                       "Crear Ticket", "problème", "problem", "demande de banc", "créer un billet", "பிரச்சனை",
+                       "டிக்கெட்", "टिकट", "tikat", "கோரிக்கை", "பெஞ்ச் கோரிக்கை", "मुसीबत", "demande"]):
         audio_string = "Happy to assist you! Can you tell your name"
         print(audio_string)
-        destini_lang = convert_language(audio_string, choosenLangCode)
-        print(destini_lang)
-        talk(destini_lang)
-        requesterName = talk_command()
-        print(requesterName)
-        if 'None' in requesterName:
-            audio_string1 = "Pardon! Can you tell your name again"
-            print(audio_string1)
-            destini_lang = convert_language(audio_string1, choosenLangCode)
-            print(destini_lang)
-            talk(destini_lang)
-            requesterName = talk_command()
-            print(requesterName)
-        else:
-            audio_string2 = "Can you tell your stationName"
-            print(audio_string2)
-            destini_lang2 = convert_language(audio_string2, choosenLangCode)
-            print(destini_lang2)
-            talk(destini_lang2)
-            stationName = talk_command()
-            print(stationName)
-            if 'None' in stationName:
-                audio_string3 = "Pardon! Can you tell your stationName again"
-                print(audio_string3)
-                destini_lang3 = convert_language(audio_string3, choosenLangCode)
-                print(destini_lang3)
-                talk(destini_lang3)
-                stationName = talk_command()
-                print(stationName)
+        if 'spanish' in choosenLangCode or 'french' in choosenLangCode or 'english' in choosenLangCode:
+            destini_lang0 = convert_language(audio_string, choosenLangCode)
+            talk(destini_lang0)
+            print(destini_lang0)
+            requesterName = multi_talk_command()
+            if 'None' in requesterName:
+                audio_string1 = "Pardon! Can you tell your name again"
+                print(audio_string1)
+                destini_lang110 = convert_language(audio_string1, choosenLangCode)
+                print(destini_lang110)
+                talk(destini_lang110)
+                requesterName = multi_talk_command()
+                print(requesterName)
             else:
-                audio_string4 = "Can you describe issue"
-                print(audio_string4)
-                destini_lang4 = convert_language(audio_string4, choosenLangCode)
-                print(destini_lang4)
-                talk(destini_lang4)
-                reqIssueDescription = talk_command()
-                print(reqIssueDescription)
-                if 'None' in reqIssueDescription:
-                    audio_string5 = "Pardon! Can you describe the issue once again"
-                    print(audio_string5)
-                    destini_lang5 = convert_language(audio_string5, choosenLangCode)
-                    print(destini_lang5)
-                    talk(destini_lang5)
-                    reqIssueDescription = talk_command()
-                    print(reqIssueDescription)
+                audio_string2 = "Can you tell your stationName"
+                print(audio_string2)
+                destini_lang2 = convert_language(audio_string2, choosenLangCode)
+                print(destini_lang2)
+                talk(destini_lang2)
+                stationName = multi_talk_command()
+                print(stationName)
+                if 'None' in stationName:
+                    audio_string3 = "Pardon! Can you tell your stationName again"
+                    print(audio_string3)
+                    destini_lang3 = convert_language(audio_string3, choosenLangCode)
+                    print(destini_lang3)
+                    talk(destini_lang3)
+                    stationName = multi_talk_command()
+                    print(stationName)
                 else:
-                    if 'None' in requesterName or 'None' in stationName or 'None' in reqIssueDescription:
-                        audio_string6 = "Pardon! The request not created due to invalid values.Please repeat"
-                        print(audio_string6)
-                        destini_lang6 = convert_language(audio_string6, choosenLangCode)
-                        print(destini_lang6)
-                        talk(destini_lang6)
+                    audio_string4 = "Can you describe issue"
+                    print(audio_string4)
+                    destini_lang4 = convert_language(audio_string4, choosenLangCode)
+                    print(destini_lang4)
+                    talk(destini_lang4)
+                    reqIssueDescription = multi_talk_command()
+                    print(reqIssueDescription)
+                    if 'None' in reqIssueDescription:
+                        audio_string5 = "Pardon! Can you describe the issue once again"
+                        print(audio_string5)
+                        destini_lang5 = convert_language(audio_string5, choosenLangCode)
+                        print(destini_lang5)
+                        talk(destini_lang5)
+                        reqIssueDescription = multi_talk_command()
+                        print(reqIssueDescription)
                     else:
-                        audio_string7 = "I am confirming the details as you given"
-                        print(audio_string7)
-                        destini_lang7 = convert_language(audio_string7, choosenLangCode)
-                        talk(destini_lang7)
-                        audio_string8 = "your name"
-                        print(audio_string8)
-                        destini_lang8 = convert_language(audio_string8, choosenLangCode)
-                        print(destini_lang8)
-                        talk(destini_lang8)
-                        talk(requesterName)
-                        audio_string9 = "your station name"
-                        print(audio_string9)
-                        destini_lang9 = convert_language(audio_string9, choosenLangCode)
-                        print(destini_lang9)
-                        talk(destini_lang9)
-                        talk(stationName)
-                        audio_string10 = "your issue description"
-                        print(audio_string10)
-                        destini_lang10 = convert_language(audio_string10, choosenLangCode)
-                        print(destini_lang10)
-                        talk(destini_lang10)
-                        talk(reqIssueDescription)
-                        audio_string11 = "All these details are okay? Shall i proceed to create? please confirm yes or no"
-                        print(audio_string11)
-                        destini_lang11 = convert_language(audio_string11, choosenLangCode)
-                        print(destini_lang11)
-                        talk(destini_lang11)
-                        confirmCreateRequest = talk_command()
-                        if 'yes' in confirmCreateRequest or 's' in confirmCreateRequest or 'z' in confirmCreateRequest:
-                            print('BenchRequest Service..')
-                            benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
-                            benchData = {"id": 0, "requestorId": 0, "requesterName": requesterName,
-                                         "stationId": 0, "stationName": stationName, "siteId": 1004, "statusId": 3,
-                                         "categoryId": 1, "subcategoryId": 1, "assigneeId": 7668, "priority": 0,
-                                         "repairAction1Id": 0, "repairAction2Id": 0, "repairAction3Id": 0,
-                                         "diagnosisId": 0,
-                                         "sBUId": 1, "systemId": 0, "description": reqIssueDescription,
-                                         "comments": "test", "userId": 0, "requesterEmail": '',
-                                         "supervisorId": 7687, "email": '',
-                                         "supervisorName": "CiscoSupervisor", "userfor": "requester",
-                                         "status": "Assigned",
-                                         "docs": ""}
-                            print(benchData)
+                        if 'None' in requesterName or 'None' in stationName or 'None' in reqIssueDescription:
+                            audio_string6 = "Pardon! The request not created due to invalid values.Please repeat"
+                            print(audio_string6)
+                            destini_lang6 = convert_language(audio_string6, choosenLangCode)
+                            print(destini_lang6)
+                            talk(destini_lang6)
+                        else:
+                            audio_string7 = "I am confirming the details as you given"
+                            print(audio_string7)
+                            destini_lang7 = convert_language(audio_string7, choosenLangCode)
+                            talk(destini_lang7)
+                            audio_string8 = "your name"
+                            print(audio_string8)
+                            print(requesterName)
+                            destini_lang8 = convert_language(audio_string8, choosenLangCode)
+                            print(destini_lang8)
+                            talk(destini_lang8)
+                            talk(requesterName)
+                            audio_string9 = "your station name"
+                            print(audio_string9)
+                            destini_lang9 = convert_language(audio_string9, choosenLangCode)
+                            print(destini_lang9)
+                            talk(destini_lang9)
+                            talk(stationName)
+                            print(stationName)
+                            audio_string10 = "your issue description"
+                            print(audio_string10)
+                            destini_lang10 = convert_language(audio_string10, choosenLangCode)
+                            print(destini_lang10)
+                            talk(destini_lang10)
+                            talk(reqIssueDescription)
+                            print(reqIssueDescription)
+                            audio_string11 = "All these details are okay? Shall i proceed to create? please confirm yes or no"
+                            print(audio_string11)
+                            destini_lang11 = convert_language(audio_string11, choosenLangCode)
+                            print(destini_lang11)
+                            talk(destini_lang11)
+                            confirmCreateRequest = multi_talk_command()
+                            if 'yes' in confirmCreateRequest or 's' in confirmCreateRequest or 'z' in confirmCreateRequest or 'zee' in confirmCreateRequest or 'ss' in confirmCreateRequest or 'sí' in confirmCreateRequest or 'Oui' in confirmCreateRequest:
+                                print('BenchRequest Service..')
+                                benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                                benchData = {"id": 0, "requestorId": 0, "requesterName": requesterName,
+                                             "stationId": 0, "stationName": stationName, "siteId": 1004, "statusId": 3,
+                                             "categoryId": 1, "subcategoryId": 1, "assigneeId": 7668, "priority": 0,
+                                             "repairAction1Id": 0, "repairAction2Id": 0, "repairAction3Id": 0,
+                                             "diagnosisId": 0,
+                                             "sBUId": 1, "systemId": 0, "description": reqIssueDescription,
+                                             "comments": "test", "userId": 0, "requesterEmail": '',
+                                             "supervisorId": 7687, "email": '',
+                                             "supervisorName": "CiscoSupervisor", "userfor": "requester",
+                                             "status": "Assigned",
+                                             "docs": ""}
+                                print(benchData)
 
-                            headers = {'Content-type': 'application/json'}
-                            print('BenchRequest Service call in progress..')
-                            # responeData = requests.put(benchReqUrl, json={'json_payload': data}, headers=headers)
-                            responeData = requests.put(benchReqUrl, headers=headers, data=json.dumps(benchData))
-                            print(responeData.json())
-                            print(responeData)
-                            if '<Response [200]>' in responeData:
-                                audio_string12 = 'Successfully created your ticket in Bench request. Thanks for using R1.0'
-                                print(audio_string12)
-                                destini_lang12 = convert_language(audio_string12, choosenLangCode)
-                                talk(destini_lang12)
-                                print(destini_lang12)
+                                headers = {'Content-type': 'application/json'}
+                                print('BenchRequest Service call in progress..')
+                                # responeData = requests.put(benchReqUrl, json={'json_payload': data}, headers=headers)
+                                responeData = requests.put(benchReqUrl, headers=headers, data=json.dumps(benchData))
+                                print(responeData.json())
+                                print(responeData)
+                                if '<Response [200]>' in responeData:
+                                    audio_string12 = 'Successfully created your ticket in Bench request. Thanks for using R1.0'
+                                    print(audio_string12)
+                                    destini_lang12 = convert_language(audio_string12, choosenLangCode)
+                                    talk(destini_lang12)
+                                    print(destini_lang12)
+                                    stopspeacking()
+                                else:
+                                    audio_string13 = 'Thanks for using R1.0'
+                                    print(audio_string13)
+                                    destini_lang13 = convert_language(audio_string13, choosenLangCode)
+                                    talk(destini_lang13)
+                                    print(destini_lang13)
+                                    stopspeacking()
+                            elif 'no' in confirmCreateRequest or 'non' in confirmCreateRequest or 'இல்லை' in confirmCreateRequest or 'नहीं' in confirmCreateRequest:
+                                audio_string14 = 'This issue will not create without your confirmation.'
+                                print(audio_string14)
+                                destini_lang14 = convert_language(audio_string14, choosenLangCode)
+                                print(audio_string14)
+                                talk(destini_lang14)
                                 stopspeacking()
                             else:
-                                audio_string13 = 'Thanks for using R1.0'
-                                print(audio_string13)
-                                destini_lang13 = convert_language(audio_string13, choosenLangCode)
-                                talk(destini_lang13)
-                                print(destini_lang13)
+                                audio_string11 = "Pardon!! Please confirm All these details are okay? Shall i proceed to create? please confirm yes or no"
+                                print(audio_string11)
+                                destini_lang11 = convert_language(audio_string11, choosenLangCode)
+                                print(destini_lang11)
+                                talk(destini_lang11)
+                                confirmCreateRequest = multi_talk_command()
+                                if 'yes' in confirmCreateRequest or 's' in confirmCreateRequest or 'z' in confirmCreateRequest or 'zee' in confirmCreateRequest or 'ss' in confirmCreateRequest or 'sí' in confirmCreateRequest or 'Oui' in confirmCreateRequest:
+                                    print('BenchRequest Service..')
+                                    benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                                    benchData = {"id": 0, "requestorId": 0, "requesterName": requesterName,
+                                                 "stationId": 0, "stationName": stationName, "siteId": 1004,
+                                                 "statusId": 3,
+                                                 "categoryId": 1, "subcategoryId": 1, "assigneeId": 7668, "priority": 0,
+                                                 "repairAction1Id": 0, "repairAction2Id": 0, "repairAction3Id": 0,
+                                                 "diagnosisId": 0,
+                                                 "sBUId": 1, "systemId": 0, "description": reqIssueDescription,
+                                                 "comments": "test", "userId": 0, "requesterEmail": '',
+                                                 "supervisorId": 7687, "email": '',
+                                                 "supervisorName": "CiscoSupervisor", "userfor": "requester",
+                                                 "status": "Assigned",
+                                                 "docs": ""}
+                                    print(benchData)
+
+                                    headers = {'Content-type': 'application/json'}
+                                    print('BenchRequest Service call in progress..')
+                                    # responeData = requests.put(benchReqUrl, json={'json_payload': data}, headers=headers)
+                                    responeData = requests.put(benchReqUrl, headers=headers, data=json.dumps(benchData))
+                                    print(responeData.json())
+                                    print(responeData)
+                                    if '<Response [200]>' in responeData:
+                                        audio_string12 = 'Successfully created your ticket in Bench request. Thanks for using R1.0'
+                                        print(audio_string12)
+                                        destini_lang12 = convert_language(audio_string12, choosenLangCode)
+                                        talk(destini_lang12)
+                                        print(destini_lang12)
+                                        stopspeacking()
+                                    else:
+                                        audio_string13 = 'Thanks for using R1.0'
+                                        print(audio_string13)
+                                        destini_lang13 = convert_language(audio_string13, choosenLangCode)
+                                        talk(destini_lang13)
+                                        print(destini_lang13)
+                                        stopspeacking()
+                                elif 'no' in confirmCreateRequest:
+                                    audio_string14 = 'This issue will not create without your confirmation.'
+                                    print(audio_string14)
+                                    destini_lang14 = convert_language(audio_string14, choosenLangCode)
+                                    print(audio_string14)
+                                    talk(destini_lang14)
+                                    stopspeacking()
+                                else:
+                                    audio_string_out = "Sorry! Try to create ticket twice but the details not given proper continue if you want to do the same process"
+                                    print(audio_string_out)
+                                    destini_lang15 = convert_language(audio_string_out, choosenLangCode)
+                                    print(destini_lang15)
+                                    talk(destini_lang15)
+        elif 'tamil' in choosenLangCode or 'hindi' in choosenLangCode:
+            destini_lang0 = convert_language(audio_string, choosenLangCode)
+            talk(destini_lang0)
+            print(destini_lang0)
+            requesterName = multi_talk_command_tamil()
+            print(requesterName)
+            command_reqname = listener.recognize_google(requesterName,
+                                                        language="en-US")  # Using google to recognize audio
+            command_reqname = command_reqname.lower()
+            print(command_reqname)
+            if 'இல்லை' in requesterName:
+                audio_string1 = "Pardon! Can you tell your name again"
+                print(audio_string1)
+                destini_lang110 = convert_language(audio_string1, choosenLangCode)
+                print(destini_lang110)
+                talk(destini_lang110)
+                requesterName = multi_talk_command_tamil()
+                print(requesterName)
+                command_reqname = listener.recognize_google(requesterName, language="en-US")  # Using google to recognize audio
+                command_reqname = command_reqname.lower()
+                print(command_reqname)
+            else:
+                audio_string2 = "Can you tell your stationName"
+                print(audio_string2)
+                destini_lang2 = convert_language(audio_string2, choosenLangCode)
+                print(destini_lang2)
+                talk(destini_lang2)
+                stationName = multi_talk_command_tamil()
+                print(stationName)
+                command_stnname = listener.recognize_google(stationName,
+                                                            language="en-US")  # Using google to recognize audio
+                command_stnname = command_stnname.lower()
+                print(command_stnname)
+                if 'இல்லை' in stationName:
+                    audio_string3 = "Pardon! Can you tell your stationName again"
+                    print(audio_string3)
+                    destini_lang3 = convert_language(audio_string3, choosenLangCode)
+                    print(destini_lang3)
+                    talk(destini_lang3)
+                    stationName = multi_talk_command_tamil()
+                    print(stationName)
+                    command_stnname = listener.recognize_google(stationName,
+                                                                language="en-US")  # Using google to recognize audio
+                    command_stnname = command_stnname.lower()
+                    print(command_stnname)
+                else:
+                    audio_string4 = "Can you describe issue"
+                    print(audio_string4)
+                    destini_lang4 = convert_language(audio_string4, choosenLangCode)
+                    print(destini_lang4)
+                    # talk(destini_lang4)
+                    reqIssueDescription = multi_talk_command_tamil()
+                    print(reqIssueDescription)
+                    command_descname = listener.recognize_google(reqIssueDescription,
+                                                                language="en-US")  # Using google to recognize audio
+                    command_descname = command_descname.lower()
+                    print(command_descname)
+                    if 'இல்லை' in reqIssueDescription:
+                        audio_string5 = "Pardon! Can you describe the issue once again"
+                        print(audio_string5)
+                        destini_lang5 = convert_language(audio_string5, choosenLangCode)
+                        print(destini_lang5)
+                        # talk(destini_lang5)
+                        reqIssueDescription = multi_talk_command_tamil()
+                        print(reqIssueDescription)
+                        command_descname = listener.recognize_google(reqIssueDescription,
+                                                                     language="en-US")  # Using google to recognize audio
+                        command_descname = command_descname.lower()
+                        print(command_descname)
+                    else:
+                        if 'இல்லை' in reqIssueDescription or 'இல்லை' in stationName or 'இல்லை' in requesterName:
+                            audio_string6 = "Pardon! The request not created due to invalid values.Please repeat"
+                            print(audio_string6)
+                            destini_lang6 = convert_language(audio_string6, choosenLangCode)
+                            print(destini_lang6)
+                            talk(destini_lang6)
+                        else:
+                            audio_string7 = "I am confirming the details as you given"
+                            print(audio_string7)
+                            destini_lang7 = convert_language(audio_string7, choosenLangCode)
+                            talk(destini_lang7)
+                            audio_string8 = "your name"
+                            print(audio_string8)
+                            destini_lang8 = convert_language(audio_string8, choosenLangCode)
+                            print(destini_lang8)
+                            talk(destini_lang8)
+                            talk(command_reqname)
+                            audio_string9 = "your station name"
+                            print(audio_string9)
+                            destini_lang9 = convert_language(audio_string9, choosenLangCode)
+                            print(destini_lang9)
+                            talk(destini_lang9)
+                            talk(command_stnname)
+                            print(stationName)
+                            audio_string10 = "your issue description"
+                            print(audio_string10)
+                            destini_lang10 = convert_language(audio_string10, choosenLangCode)
+                            print(destini_lang10)
+                            talk(destini_lang10)
+                            talk(command_descname)
+                            print(reqIssueDescription)
+                            audio_string11 = "All these details are okay? Shall i proceed to create? please confirm " \
+                                             "yes or no "
+                            print(audio_string11)
+                            destini_lang11 = convert_language(audio_string11, choosenLangCode)
+                            print(destini_lang11)
+                            # talk(destini_lang11)
+                            confirmCreateRequest = multi_talk_command_tamil()
+                            if 'yes' in confirmCreateRequest or 'हां' in confirmCreateRequest or 'theek hai' in confirmCreateRequest or 'ठीक है' in confirmCreateRequest or 'சரி' in confirmCreateRequest or 'ஆம்' in confirmCreateRequest or 'haan' in confirmCreateRequest:
+                                print('BenchRequest Service..')
+                                benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                                benchData = {"id": 0, "requestorId": 0, "requesterName": command_reqname,
+                                             "stationId": 0, "stationName": command_stnname, "siteId": 1004,
+                                             "statusId": 3,
+                                             "categoryId": 1, "subcategoryId": 1, "assigneeId": 7668, "priority": 0,
+                                             "repairAction1Id": 0, "repairAction2Id": 0, "repairAction3Id": 0,
+                                             "diagnosisId": 0,
+                                             "sBUId": 1, "systemId": 0, "description": command_descname,
+                                             "comments": "test", "userId": 0, "requesterEmail": '',
+                                             "supervisorId": 7687, "email": '',
+                                             "supervisorName": "CiscoSupervisor", "userfor": "requester",
+                                             "status": "Assigned",
+                                             "docs": ""}
+                                print(benchData)
+
+                                headers = {'Content-type': 'application/json'}
+                                print('BenchRequest Service call in progress..')
+                                # responeData = requests.put(benchReqUrl, json={'json_payload': data}, headers=headers)
+                                responeData = requests.put(benchReqUrl, headers=headers, data=json.dumps(benchData))
+                                print(responeData.json())
+                                print(responeData)
+                                if '<Response [200]>' in responeData:
+                                    audio_string12 = 'Successfully created your ticket in Bench request. Thanks for using R1.0'
+                                    print(audio_string12)
+                                    destini_lang12 = convert_language(audio_string12, choosenLangCode)
+                                    # talk(destini_lang12)
+                                    print(destini_lang12)
+                                    stopspeacking()
+                                else:
+                                    audio_string13 = 'Thanks for using R1.0'
+                                    print(audio_string13)
+                                    destini_lang13 = convert_language(audio_string13, choosenLangCode)
+                                    # talk(destini_lang13)
+                                    print(destini_lang13)
+                                    stopspeacking()
+                            elif 'no' in confirmCreateRequest:
+                                audio_string14 = 'This issue will not create without your confirmation.'
+                                print(audio_string14)
+                                destini_lang14 = convert_language(audio_string14, choosenLangCode)
+                                print(destini_lang14)
+                                # talk(destini_lang14)
                                 stopspeacking()
-                        elif 'no' in confirmCreateRequest:
-                            audio_string14 = 'This issue will not create without your confirmation.'
-                            print(audio_string14)
-                            destini_lang14 = convert_language(audio_string14, choosenLangCode)
-                            print(audio_string14)
-                            talk(destini_lang14)
-                            stopspeacking()
+        else:
+            destini_lang0 = convert_language(audio_string, choosenLangCode)
+            talk(destini_lang0)
+            print(destini_lang0)
+            requesterName = multi_talk_command()
+            if 'None' in requesterName:
+                audio_string1 = "Pardon! Can you tell your name again"
+                print(audio_string1)
+                destini_lang110 = convert_language(audio_string1, choosenLangCode)
+                print(destini_lang110)
+                talk(destini_lang110)
+                requesterName = multi_talk_command()
+                print(requesterName)
+            else:
+                audio_string2 = "Can you tell your stationName"
+                print(audio_string2)
+                destini_lang2 = convert_language(audio_string2, choosenLangCode)
+                print(destini_lang2)
+                talk(destini_lang2)
+                stationName = multi_talk_command()
+                print(stationName)
+                if 'None' in stationName:
+                    audio_string3 = "Pardon! Can you tell your stationName again"
+                    print(audio_string3)
+                    destini_lang3 = convert_language(audio_string3, choosenLangCode)
+                    print(destini_lang3)
+                    talk(destini_lang3)
+                    stationName = multi_talk_command()
+                    print(stationName)
+                else:
+                    audio_string4 = "Can you describe issue"
+                    print(audio_string4)
+                    destini_lang4 = convert_language(audio_string4, choosenLangCode)
+                    print(destini_lang4)
+                    talk(destini_lang4)
+                    reqIssueDescription = multi_talk_command()
+                    print(reqIssueDescription)
+                    if 'None' in reqIssueDescription:
+                        audio_string5 = "Pardon! Can you describe the issue once again"
+                        print(audio_string5)
+                        destini_lang5 = convert_language(audio_string5, choosenLangCode)
+                        print(destini_lang5)
+                        talk(destini_lang5)
+                        reqIssueDescription = multi_talk_command()
+                        print(reqIssueDescription)
+                    else:
+                        if 'None' in requesterName or 'None' in stationName or 'None' in reqIssueDescription:
+                            audio_string6 = "Pardon! The request not created due to invalid values.Please repeat"
+                            print(audio_string6)
+                            destini_lang6 = convert_language(audio_string6, choosenLangCode)
+                            print(destini_lang6)
+                            talk(destini_lang6)
+                        else:
+                            audio_string7 = "I am confirming the details as you given"
+                            print(audio_string7)
+                            destini_lang7 = convert_language(audio_string7, choosenLangCode)
+                            talk(destini_lang7)
+                            audio_string8 = "your name"
+                            print(audio_string8)
+                            print(requesterName)
+                            destini_lang8 = convert_language(audio_string8, choosenLangCode)
+                            print(destini_lang8)
+                            talk(destini_lang8)
+                            talk(requesterName)
+                            audio_string9 = "your station name"
+                            print(audio_string9)
+                            destini_lang9 = convert_language(audio_string9, choosenLangCode)
+                            print(destini_lang9)
+                            talk(destini_lang9)
+                            talk(stationName)
+                            audio_string10 = "your issue description"
+                            print(audio_string10)
+                            destini_lang10 = convert_language(audio_string10, choosenLangCode)
+                            print(destini_lang10)
+                            talk(destini_lang10)
+                            talk(reqIssueDescription)
+                            audio_string11 = "All these details are okay? Shall i proceed to create? please confirm yes or no"
+                            print(audio_string11)
+                            destini_lang11 = convert_language(audio_string11, choosenLangCode)
+                            print(destini_lang11)
+                            talk(destini_lang11)
+                            confirmCreateRequest = multi_talk_command()
+                            if 'yes' in confirmCreateRequest or 's' in confirmCreateRequest or 'z' in confirmCreateRequest or 'zee' in confirmCreateRequest or 'ss' in confirmCreateRequest or 'sí' in confirmCreateRequest or 'Oui' in confirmCreateRequest:
+                                print('BenchRequest Service..')
+                                benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                                benchData = {"id": 0, "requestorId": 0, "requesterName": requesterName,
+                                             "stationId": 0, "stationName": stationName, "siteId": 1004, "statusId": 3,
+                                             "categoryId": 1, "subcategoryId": 1, "assigneeId": 7668, "priority": 0,
+                                             "repairAction1Id": 0, "repairAction2Id": 0, "repairAction3Id": 0,
+                                             "diagnosisId": 0,
+                                             "sBUId": 1, "systemId": 0, "description": reqIssueDescription,
+                                             "comments": "test", "userId": 0, "requesterEmail": '',
+                                             "supervisorId": 7687, "email": '',
+                                             "supervisorName": "CiscoSupervisor", "userfor": "requester",
+                                             "status": "Assigned",
+                                             "docs": ""}
+                                print(benchData)
+
+                                headers = {'Content-type': 'application/json'}
+                                print('BenchRequest Service call in progress..')
+                                # responeData = requests.put(benchReqUrl, json={'json_payload': data}, headers=headers)
+                                responeData = requests.put(benchReqUrl, headers=headers, data=json.dumps(benchData))
+                                print(responeData.json())
+                                print(responeData)
+                                if '<Response [200]>' in responeData:
+                                    audio_string12 = 'Successfully created your ticket in Bench request. Thanks for using R1.0'
+                                    print(audio_string12)
+                                    destini_lang12 = convert_language(audio_string12, choosenLangCode)
+                                    talk(destini_lang12)
+                                    print(destini_lang12)
+                                    stopspeacking()
+                                else:
+                                    audio_string13 = 'Thanks for using R1.0'
+                                    print(audio_string13)
+                                    destini_lang13 = convert_language(audio_string13, choosenLangCode)
+                                    talk(destini_lang13)
+                                    print(destini_lang13)
+                                    stopspeacking()
+                            elif 'no' in confirmCreateRequest or 'non' in confirmCreateRequest or 'இல்லை' in confirmCreateRequest or 'नहीं' in confirmCreateRequest:
+                                audio_string14 = 'This issue will not create without your confirmation.'
+                                print(audio_string14)
+                                destini_lang14 = convert_language(audio_string14, choosenLangCode)
+                                print(audio_string14)
+                                talk(destini_lang14)
+                                stopspeacking()
+                            else:
+                                audio_string11 = "Pardon!! Please confirm All these details are okay? Shall i proceed to create? please confirm yes or no"
+                                print(audio_string11)
+                                destini_lang11 = convert_language(audio_string11, choosenLangCode)
+                                print(destini_lang11)
+                                talk(destini_lang11)
+                                confirmCreateRequest = multi_talk_command()
+                                if 'yes' in confirmCreateRequest or 's' in confirmCreateRequest or 'z' in confirmCreateRequest or 'zee' in confirmCreateRequest or 'ss' in confirmCreateRequest or 'sí' in confirmCreateRequest or 'Oui' in confirmCreateRequest:
+                                    print('BenchRequest Service..')
+                                    benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                                    benchData = {"id": 0, "requestorId": 0, "requesterName": requesterName,
+                                                 "stationId": 0, "stationName": stationName, "siteId": 1004,
+                                                 "statusId": 3,
+                                                 "categoryId": 1, "subcategoryId": 1, "assigneeId": 7668, "priority": 0,
+                                                 "repairAction1Id": 0, "repairAction2Id": 0, "repairAction3Id": 0,
+                                                 "diagnosisId": 0,
+                                                 "sBUId": 1, "systemId": 0, "description": reqIssueDescription,
+                                                 "comments": "test", "userId": 0, "requesterEmail": '',
+                                                 "supervisorId": 7687, "email": '',
+                                                 "supervisorName": "CiscoSupervisor", "userfor": "requester",
+                                                 "status": "Assigned",
+                                                 "docs": ""}
+                                    print(benchData)
+
+                                    headers = {'Content-type': 'application/json'}
+                                    print('BenchRequest Service call in progress..')
+                                    # responeData = requests.put(benchReqUrl, json={'json_payload': data}, headers=headers)
+                                    responeData = requests.put(benchReqUrl, headers=headers, data=json.dumps(benchData))
+                                    print(responeData.json())
+                                    print(responeData)
+                                    if '<Response [200]>' in responeData:
+                                        audio_string12 = 'Successfully created your ticket in Bench request. Thanks for using R1.0'
+                                        print(audio_string12)
+                                        destini_lang12 = convert_language(audio_string12, choosenLangCode)
+                                        talk(destini_lang12)
+                                        print(destini_lang12)
+                                        stopspeacking()
+                                    else:
+                                        audio_string13 = 'Thanks for using R1.0'
+                                        print(audio_string13)
+                                        destini_lang13 = convert_language(audio_string13, choosenLangCode)
+                                        talk(destini_lang13)
+                                        print(destini_lang13)
+                                        stopspeacking()
+                                elif 'no' in confirmCreateRequest:
+                                    audio_string14 = 'This issue will not create without your confirmation.'
+                                    print(audio_string14)
+                                    destini_lang14 = convert_language(audio_string14, choosenLangCode)
+                                    print(audio_string14)
+                                    talk(destini_lang14)
+                                    stopspeacking()
+                                else:
+                                    audio_string_out = "Sorry! Try to create ticket twice but the details not given proper continue if you want to do the same process"
+                                    print(audio_string_out)
+                                    destini_lang15 = convert_language(audio_string_out, choosenLangCode)
+                                    print(destini_lang15)
+                                    talk(destini_lang15)
 
     elif there_exists(["play"]):
         song = command.replace('play', '')
@@ -466,17 +980,39 @@ def there_exists(terms):
 
 def convert_language(audio_string, language_code):
     # invoking Translator
-    if 'spanish' in language_code:
-        translate_text = translator.translate(audio_string, dest='es')
-    elif 'french' in language_code:
-        translate_text = translator.translate(audio_string, dest='fr')
-    elif 'tamil' in language_code:
-        translate_text = translator.translate(audio_string, dest='ta')
-    elif 'hindi' in language_code:
-        translate_text = translator.translate(audio_string, dest='hi')
+    if 'spanish' in language_code or 'french' in language_code:
+        if 'spanish' in language_code:
+            translate_text = translator.translate(audio_string, dest='es')
+        elif 'french' in language_code:
+            translate_text = translator.translate(audio_string, dest='fr')
+        return translate_text.text
+    elif 'tamil' in language_code or 'hindi' in language_code:
+        print('am i here in tamil/hindi block?')
+        if 'tamil' in language_code:
+            print('am i here in tamil block?')
+            translate_text = translator.translate(audio_string, dest='ta')
+            print(translate_text)
+            tts = gt.gTTS(text=translate_text.text, lang="ta")
+            basename = "tamilaudio"
+            suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
+            filename = "_".join([basename, suffix])  # e.g. 'mylogfile_120508_171442'
+            tts.save(filename + ".mp3")
+            print(filename)
+            os.system(filename + ".mp3")
+            time.sleep(8)
+        elif 'hindi' in language_code:
+            translate_text = translator.translate(audio_string, dest='hi')
+            tts = gt.gTTS(text=translate_text.text, lang="hi")
+            basename = "hindiaudio"
+            suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
+            filename = "_".join([basename, suffix])  # e.g. 'mylogfile_120508_171442'
+            tts.save(filename + ".mp3")
+            os.system(filename + ".mp3")
+            time.sleep(8)
+        return translate_text.text
     else:
         translate_text = translator.translate(audio_string, dest='en')
-    return translate_text.text
+        return translate_text.text
 
 
 def startspeakeithme():
@@ -487,7 +1023,6 @@ def startspeakeithme():
     else:
         print('please confirm your language')
         choosenLangcode = choose_language()
-
     # time.sleep()
     while True:
         run_alexa(choosenLangcode)
