@@ -197,7 +197,7 @@ def multi_talk_command():
         multi_talk_command()
         # return "None"
 
-def multi_talk_command_tamil():
+def multi_talk_command_tamil(choosenLangCode):
     global command
     try:
         # use the microphone as source for input.
@@ -212,20 +212,20 @@ def multi_talk_command_tamil():
             voice = listener.listen(source)
             print('Done recording')
             print(voice)
-            command = listener.recognize_google(voice,  language="ta-IN")  # Using google to recognize audio
-            """
+            # command = listener.recognize_google(voice,  language="ta-IN")
+
             if "spanish" in choosenLangCode:
-                command = listener.recognize_google(voice, language="es-MX")  # Using google to recognize audio
+                command = listener.recognize_google(voice, language="es-MX")
             elif "french" in choosenLangCode:
-                command = listener.recognize_google(voice, language="fr-CA")  # Using google to recognize audio
+                command = listener.recognize_google(voice, language="fr-CA")
             elif "tamil" in choosenLangCode:
-                command = listener.recognize_google(voice, language="ta-IN")  # Using google to recognize audio
+                command = listener.recognize_google(voice, language="ta-IN")
             elif "hindi" in choosenLangCode:
-                command = listener.recognize_google(voice, language="hi-IN")  # Using google to recognize audio
+                command = listener.recognize_google(voice, language="hi-IN")
             else:
-            """
-            # command = listener.recognize_google(voice)  # Using google to recognize audio
-            # command = listener.recognize_google(voice, language="en-US")  # Using google to recognize audio
+                command = listener.recognize_google(voice, language="en-US")
+            # command = listener.recognize_google(voice)
+            # command = listener.recognize_google(voice, language="en-US")
             # command = command.lower()
             return command
     except:
@@ -302,6 +302,7 @@ def extract_city_name_for_weather_action(recognized_text):
 def run_alexa(choosenLangCode):
     global command
     command = listen_command(choosenLangCode)
+    print(command)
 
     if is_weather_search_action(command):
         print(command)
@@ -503,17 +504,17 @@ def run_alexa(choosenLangCode):
             destini_lang0 = convert_language(audio_string, choosenLangCode)
             talk(destini_lang0)
             print(destini_lang0)
-            requesterName = multi_talk_command_tamil()
+            requesterName = multi_talk_command_tamil(choosenLangCode)
             print(requesterName)
             command_reqname = convert_language(requesterName, "english")  # Using google to recognize audio
             print(command_reqname)
-            if 'இல்லை' in requesterName:
+            if 'இல்லை' in requesterName or 'नहीं' in requesterName or 'nahin' in requesterName:
                 audio_string1 = "Pardon! Can you tell your name again"
                 print(audio_string1)
                 destini_lang110 = convert_language(audio_string1, choosenLangCode)
                 print(destini_lang110)
                 talk(destini_lang110)
-                requesterName = multi_talk_command_tamil()
+                requesterName = multi_talk_command_tamil(choosenLangCode)
                 print(requesterName)
                 command_reqname = convert_language(requesterName, "english")  # Using google to recognize audio
                 print(command_reqname)
@@ -523,17 +524,17 @@ def run_alexa(choosenLangCode):
                 destini_lang2 = convert_language(audio_string2, choosenLangCode)
                 print(destini_lang2)
                 talk(destini_lang2)
-                stationName = multi_talk_command_tamil()
+                stationName = multi_talk_command_tamil(choosenLangCode)
                 print(stationName)
                 command_stnname = convert_language(stationName, "english")  # Using google to recognize audio
                 print(command_stnname)
-                if 'இல்லை' in stationName:
+                if 'இல்லை' in stationName or 'नहीं' in stationName or 'nahin' in stationName:
                     audio_string3 = "Pardon! Can you tell your stationName again"
                     print(audio_string3)
                     destini_lang3 = convert_language(audio_string3, choosenLangCode)
                     print(destini_lang3)
                     talk(destini_lang3)
-                    stationName = multi_talk_command_tamil()
+                    stationName = multi_talk_command_tamil(choosenLangCode)
                     print(stationName)
                     command_stnname = convert_language(stationName, "english") # Using google to recognize audio
                     print(command_stnname)
@@ -542,23 +543,23 @@ def run_alexa(choosenLangCode):
                     print(audio_string4)
                     destini_lang4 = convert_language(audio_string4, choosenLangCode)
                     print(destini_lang4)
-                    # talk(destini_lang4)
-                    reqIssueDescription = multi_talk_command_tamil()
+                    talk(destini_lang4)
+                    reqIssueDescription = multi_talk_command_tamil(choosenLangCode)
                     print(reqIssueDescription)
                     command_descname = convert_language(reqIssueDescription, "english") # Using google to recognize audio
                     print(command_descname)
-                    if 'இல்லை' in reqIssueDescription:
+                    if 'இல்லை' in reqIssueDescription or 'नहीं' in reqIssueDescription or 'nahin' in reqIssueDescription:
                         audio_string5 = "Pardon! Can you describe the issue once again"
                         print(audio_string5)
                         destini_lang5 = convert_language(audio_string5, choosenLangCode)
                         print(destini_lang5)
-                        # talk(destini_lang5)
-                        reqIssueDescription = multi_talk_command_tamil()
+                        talk(destini_lang5)
+                        reqIssueDescription = multi_talk_command_tamil(choosenLangCode)
                         print(reqIssueDescription)
                         command_descname = convert_language(reqIssueDescription, "english")  # Using google to recognize audio
                         print(command_descname)
                     else:
-                        if 'இல்லை' in reqIssueDescription or 'இல்லை' in stationName or 'இல்லை' in requesterName:
+                        if 'இல்லை' in reqIssueDescription or 'இல்லை' in stationName or 'இல்லை' in requesterName or 'नहीं' in requesterName or 'nahin' in requesterName or 'नहीं' in stationName or 'nahin' in stationName or 'नहीं' in reqIssueDescription or 'nahin' in reqIssueDescription:
                             audio_string6 = "Pardon! The request not created due to invalid values.Please repeat"
                             print(audio_string6)
                             destini_lang6 = convert_language(audio_string6, choosenLangCode)
@@ -594,8 +595,8 @@ def run_alexa(choosenLangCode):
                             print(audio_string11)
                             destini_lang11 = convert_language(audio_string11, choosenLangCode)
                             print(destini_lang11)
-                            # talk(destini_lang11)
-                            confirmCreateRequest = multi_talk_command_tamil()
+                            talk(destini_lang11)
+                            confirmCreateRequest = multi_talk_command_tamil(choosenLangCode)
                             if 'yes' in confirmCreateRequest or 'हां' in confirmCreateRequest or 'theek hai' in confirmCreateRequest or 'ठीक है' in confirmCreateRequest or 'சரி' in confirmCreateRequest or 'ஆம்' in confirmCreateRequest or 'haan' in confirmCreateRequest:
                                 print('BenchRequest Service..')
                                 benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
@@ -630,15 +631,15 @@ def run_alexa(choosenLangCode):
                                     audio_string13 = 'Thanks for using R1.0'
                                     print(audio_string13)
                                     destini_lang13 = convert_language(audio_string13, choosenLangCode)
-                                    # talk(destini_lang13)
+                                    talk(destini_lang13)
                                     print(destini_lang13)
                                     stopspeacking()
-                            elif 'no' in confirmCreateRequest:
+                            elif 'no' in confirmCreateRequest or 'இல்லை' in confirmCreateRequest or 'नहीं' in confirmCreateRequest:
                                 audio_string14 = 'This issue will not create without your confirmation.'
                                 print(audio_string14)
                                 destini_lang14 = convert_language(audio_string14, choosenLangCode)
                                 print(destini_lang14)
-                                # talk(destini_lang14)
+                                talk(destini_lang14)
                                 stopspeacking()
         else:
             destini_lang0 = convert_language(audio_string, choosenLangCode)
@@ -758,7 +759,7 @@ def run_alexa(choosenLangCode):
                                     talk(destini_lang13)
                                     print(destini_lang13)
                                     stopspeacking()
-                            elif 'no' in confirmCreateRequest or 'non' in confirmCreateRequest or 'இல்லை' in confirmCreateRequest or 'नहीं' in confirmCreateRequest:
+                            elif 'no' in confirmCreateRequest or 'non' in confirmCreateRequest:
                                 audio_string14 = 'This issue will not create without your confirmation.'
                                 print(audio_string14)
                                 destini_lang14 = convert_language(audio_string14, choosenLangCode)
