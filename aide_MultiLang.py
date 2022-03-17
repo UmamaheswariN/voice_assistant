@@ -32,6 +32,7 @@ from googletrans import Translator
 import googletrans
 import json
 import keyboard
+from fedex.tools.conversion import sobject_to_json
 
 obj = tk.Tk()
 obj.title("Contec Voice Assistant")
@@ -867,11 +868,16 @@ def run_alexa(choosenLangCode):
     elif there_exists(["fedex", "tracking", "delivery", "where is package", "Shipment details"]):
         print("Am glad to help you on this, can you please provide me tracking number to get the status")
         talk("Am glad to help you on this, can you please provide me tracking number to get the status")
+        print("sample tracking 123456789012/ 858488600850")
+        print("122816215025810 = Delivered")
+        print("020207021381215 = Picked Up")
+        print("403934084723025 = Arrived at FedEx location")
+        print("920241085725456 = At local FedEx facility")
         tracking_number = listen_trac_command()
         audio_tra7 = "I am confirming the details: the given tracking number is"
         print(audio_tra7)
         talk(audio_tra7)
-        talk(tracking_number)  # sample tracking 123456789012/ 858488600850
+        talk(tracking_number)
         print(tracking_number)
         tracking_number = re.sub(r'(\d)\s+(\d)', r'\1\2', tracking_number)
         print(tracking_number)
@@ -910,9 +916,9 @@ def run_alexa(choosenLangCode):
                     "shipDateEnd": "2022-03-15",
                     "shipDateBegin": "2022-03-01",
                     "trackingNumberInfo": {
-                      "trackingNumberUniqueId": "245822~123456789012~FDEG",
-                      "carrierCode": "FDXE",
-                      "trackingNumber": "123456789012"
+                      "trackingNumberUniqueId": "245822~"+ tracking_number +"~FDEG",
+                      "carrierCode": "FDXG",
+                      "trackingNumber": tracking_number
                     }
                   },
                   "pagingDetails": {
@@ -932,20 +938,29 @@ def run_alexa(choosenLangCode):
             print(payload)
             response = requests.request("POST", url, data=payload, headers=headers)
             print(response.text)
-
             print('Fedex Service call in progress..')
+            talk('Please Wait...Fedex Service call in progress..')
             # responeData = requests.request("POST", fedexReqUrl, data=fedexData, headers=headers)
             print("response.json()...................")
-            print(response.json())
-            responseData = response.json()
-            print("response..........................")
-            print(response)
+            responseData = response.text
+            # print(responseData)
+            # print(json.loads(responseData)['output'])
+            # print(json.loads(responseData)['output']['completeTrackResults'])
+            # outputres = json.loads(responseData)['output']['completeTrackResults'][0]['trackResults']
+            # print(outputres)
+            tracking_code = json.loads(responseData)['output']['completeTrackResults'][0]['trackResults'][0]['error']['code']
+            tracking_msg =  json.loads(responseData)['output']['completeTrackResults'][0]['trackResults'][0]['error']['message']
             if response.status_code == 200:
-                tra_string12 = 'Successfully located. Thanks for using R1.0'
+                tra_string12 = 'Successfully located.And the message has been received from fedex is'
                 print(tra_string12)
                 talk(tra_string12)
+                print(tracking_msg)
+                talk(tracking_msg)
+                tra_string112 = 'Thanks for using R1.0'
+                print(tra_string112)
+                talk(tra_string112)
             elif response.status_code == 400:
-                tra_err = 'Please provide a valid reference/associated type'
+                tra_err = 'Sorry! not able to locate Please provide a valid reference/associated type'
                 print(tra_err)
                 talk(tra_err)
             elif response.status_code == 401:
