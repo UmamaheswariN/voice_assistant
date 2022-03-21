@@ -1,38 +1,34 @@
-import speech_recognition as sr  # used to convert human speech to text
+import datetime
+import os
+import re
+import sys  # to get exit
+import time
+import tkinter as tk
+import webbrowser
+import winsound
+from logging import exception
+from tkinter import *
+import tkinter.messagebox as message
+# from tkinter.ttk import *
+import cv2
+import gtts as gt
+import json
+import pyautogui
+import pyjokes
 import pyttsx3  # used to convert text to speech
 import pywhatkit  # to play you tube music
-import datetime
+import requests
+import speech_recognition as sr  # used to convert human speech to text
 import wikipedia
-import pyjokes
-import time
-import os
-import subprocess
 from GoogleNews import GoogleNews
-import sys  # to get exit
-import imdb  # to get any movie details
-from PIL import ImageTk
-import osascript
-import requests, json
-import gtts as gt
-from weather import *
-import re
-from util import *
-# importing required module
-import tkinter as tk
-from tkinter.ttk import *
-# import messagebox from tkinter module
-import tkinter.messagebox
-from tkinter import LEFT, RIGHT, TOP, BOTTOM, CENTER
-from tkinter.font import Font
-from tkinter import *
-from tkinter.ttk import *
-from gtts import gTTS
-import random
 from googletrans import Translator
-import googletrans
-import json
-import keyboard
-from fedex.tools.conversion import sobject_to_json
+from pygame import mixer
+
+from weather import *
+
+# import messagebox from tkinter module
+
+global query
 
 obj = tk.Tk()
 obj.title("Contec Voice Assistant")
@@ -40,13 +36,11 @@ obj.geometry('800x500')
 obj.resizable(False, False)
 obj.config(bg='')
 
-import playsound
-
 googlenews = GoogleNews()
 translator = Translator()
-
 listener = sr.Recognizer()  # initialization
 engine = pyttsx3.init()  # used to talk
+voices = engine.getProperty('voices')
 
 
 def getCorrectPath(relative_path):
@@ -54,12 +48,17 @@ def getCorrectPath(relative_path):
     return os.path.join(p, relative_path)
 
 
+def speak(audio):
+    engine.say(audio)
+    engine.runAndWait()
+
+
 def talk(command):
     engine = pyttsx3.init()  # used to talk
-    voices = engine.getProperty('voices')
+    #  voices = engine.getProperty('voices')
     # setter method .[0]=male voice and
     # [1]=female voice in set Property.
-    engine.setProperty('voice', voices[1].id)
+    engine.setProperty('voice', voices[0].id)
     # Method for the speaking of the the assistant
     engine.say(command)
     engine.setProperty('rate', 200)
@@ -67,6 +66,41 @@ def talk(command):
     # Blocks while processing all the currently
     # queued commands
     engine.runAndWait()
+
+
+def detect_face():
+    cascPath = os.path.dirname(cv2.__file__) + "/data/haarcascade_frontalface_default.xml"
+    faceCascade = cv2.CascadeClassifier(cascPath)
+    video_capture = cv2.VideoCapture(0)
+
+    while True:
+        # Capture frame-by-frame
+        ret, frames = video_capture.read()
+
+        gray = cv2.cvtColor(frames, cv2.COLOR_BGR2GRAY)
+
+        faces = faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(30, 30),
+            flags=cv2.CASCADE_SCALE_IMAGE
+        )
+
+        # Draw a rectangle around the faces
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frames, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+        # Display the resulting frame
+        cv2.imshow('Video', frames)
+        speak("detecting face")
+        print("Detecting face.....")
+        time.sleep(10)
+        pyautogui.press('q')
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    video_capture.release()
+    cv2.destroyAllWindows()
 
 
 def wishMe():
@@ -337,6 +371,88 @@ def is_weather_search_action(recognized_text):
 def extract_city_name_for_weather_action(recognized_text):
     text = recognized_text.lower()
     return text.replace("what is the weather in", "").strip()
+
+
+def takeCommand():
+    global query
+
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        r.pause_threshold = 0.9
+        audio = r.listen(source)
+
+    try:
+        print("Recognizing...")
+        query = r.recognize_google(audio, language='en-in')
+        print(f"User said: {query}\n")
+
+    except Exception as e:
+        # print(e)
+        print("Say that again please...")
+        # speak('Say that again please...')
+        return "None"
+    return query
+
+
+def brightness():
+    try:
+        query = takeCommand().lower()
+        if '25' in query:
+            pyautogui.moveTo(1880, 1050)
+            pyautogui.click()
+            time.sleep(1)
+            pyautogui.moveTo(1610, 960)
+            pyautogui.click()
+            pyautogui.moveTo(1880, 1050)
+            pyautogui.click()
+            speak('If you again want to change brihtness, say, change brightness')
+        elif '50' in query:
+            pyautogui.moveTo(1880, 1050)
+            pyautogui.click()
+            time.sleep(1)
+            pyautogui.moveTo(1684, 960)
+            pyautogui.click()
+            pyautogui.moveTo(1880, 1050)
+            pyautogui.click()
+            speak('If you again want to change brihtness, say, change brightness')
+        elif '75' in query:
+            pyautogui.moveTo(1880, 1050)
+            pyautogui.click()
+            time.sleep(1)
+            pyautogui.moveTo(1758, 960)
+            pyautogui.click()
+            pyautogui.moveTo(1880, 1050)
+            pyautogui.click()
+            speak('If you again want to change brihtness, say, change brightness')
+        elif '100' in query or 'full' in query:
+            pyautogui.moveTo(1880, 1050)
+            pyautogui.click()
+            time.sleep(1)
+            pyautogui.moveTo(1835, 960)
+            pyautogui.click()
+            pyautogui.moveTo(1880, 1050)
+            pyautogui.click()
+            speak('If you again want to change brihtness, say, change brightness')
+        else:
+            speak('Please select 25, 50, 75 or 100....... Say again.')
+            brightness()
+    except exception as e:
+        # print(e)
+        speak('Something went wrong')
+
+
+def close_window():
+    try:
+        if 'y' in query:
+            pyautogui.moveTo(1885, 10)
+            pyautogui.click()
+        else:
+            speak('ok')
+            pyautogui.moveTo(1000, 500)
+    except exception as e:
+        # print(e)
+        speak('error')
 
 
 def run_alexa(choosenLangCode):
@@ -863,6 +979,7 @@ def run_alexa(choosenLangCode):
                                     destini_lang15 = convert_language(audio_string_out, choosenLangCode)
                                     print(destini_lang15)
                                     talk(destini_lang15)
+        run_alexa(choosenLangCode)
 
 
     elif there_exists(["fedex", "tracking", "delivery", "where is package", "Shipment details"]):
@@ -910,22 +1027,22 @@ def run_alexa(choosenLangCode):
             url = "https://apis-sandbox.fedex.com/track/v1/associatedshipments"
 
             input1 = {
-                  "includeDetailedScans": 1,
-                  "associatedType": "STANDARD_MPS",
-                  "masterTrackingNumberInfo": {
+                "includeDetailedScans": 1,
+                "associatedType": "STANDARD_MPS",
+                "masterTrackingNumberInfo": {
                     "shipDateEnd": "2022-03-15",
                     "shipDateBegin": "2022-03-01",
                     "trackingNumberInfo": {
-                      "trackingNumberUniqueId": "245822~"+ tracking_number +"~FDEG",
-                      "carrierCode": "FDXG",
-                      "trackingNumber": tracking_number
+                        "trackingNumberUniqueId": "245822~" + tracking_number + "~FDEG",
+                        "carrierCode": "FDXG",
+                        "trackingNumber": tracking_number
                     }
-                  },
-                  "pagingDetails": {
+                },
+                "pagingDetails": {
                     "resultsPerPage": 56,
                     "pagingToken": "38903279038"
-                  }
                 }
+            }
 
             headers = {
                 'Content-Type': "application/json",
@@ -948,8 +1065,10 @@ def run_alexa(choosenLangCode):
             # print(json.loads(responseData)['output']['completeTrackResults'])
             # outputres = json.loads(responseData)['output']['completeTrackResults'][0]['trackResults']
             # print(outputres)
-            tracking_code = json.loads(responseData)['output']['completeTrackResults'][0]['trackResults'][0]['error']['code']
-            tracking_msg =  json.loads(responseData)['output']['completeTrackResults'][0]['trackResults'][0]['error']['message']
+            tracking_code = json.loads(responseData)['output']['completeTrackResults'][0]['trackResults'][0]['error'][
+                'code']
+            tracking_msg = json.loads(responseData)['output']['completeTrackResults'][0]['trackResults'][0]['error'][
+                'message']
             if response.status_code == 200:
                 tra_string12 = 'Successfully located.And the message has been received from fedex is'
                 print(tra_string12)
@@ -987,11 +1106,12 @@ def run_alexa(choosenLangCode):
                 tra_string13 = 'Thanks for using R1.0'
                 print(tra_string13)
                 talk(tra_string13)
-            stopspeacking()
+            #stopspeacking()
         else:
             talk("Pardon! can you please come again the same")
             listen_trac_command()
-            stopspeacking()
+            #stopspeacking()
+        run_alexa(choosenLangCode)
 
     elif there_exists(["play"]):
         song = command.replace('play', '')
@@ -1082,9 +1202,6 @@ def run_alexa(choosenLangCode):
         print(pyjokes.get_joke())
         time.sleep(1)
 
-    elif there_exists(["log off", "sign out", "log out", "stop"]):
-        talk("Ok , your pc will log off in 10 sec make sure you exit from all applications")
-        sys.exit()
     #   subprocess.call(["sleep", "/l"])
 
     elif 'headlines' in command:
@@ -1127,10 +1244,251 @@ def run_alexa(choosenLangCode):
         a = googlenews.gettext()
         print(*a[1:5], sep=',')
 
+    elif there_exists(['alarm']):
+        alarm()
+
+    elif there_exists(['hi', 'wake', 'hello', 'rithik', 'R1.0', 'R1', 'Hey', 'aur 1.0', 'uma']):
+        speak('yes am here..Tell me how can i help you')
+
+    elif there_exists(['change voice', 'change your voice']):
+        engine.setProperty('voice', voices[1].id)
+        speak("Here's an example of one of my voices. Would you like to use this one?")
+        query1 = takeCommand().lower()
+        if 'y' in query1 or 'sure' in query1 or 'of course' in query1:
+            speak('Great. I will keep using this voice.')
+            engine.setProperty('voice', voices[1].id)
+        elif 'n' in query1:
+            speak('Ok. I am back to my other voice.')
+            engine.setProperty('voice', voices[0].id)
+        else:
+            speak('Sorry, I am having trouble understanding. I am back to my other voice.')
+            engine.setProperty('voice', voices[0].id)
+
+    elif there_exists(['increase', 'decrease', 'change', 'minimize', 'maximize']) and 'brightness' in command:
+        speak('At what percent should I kept the brightness, 25, 50, 75 or 100?')
+        brightness()
+
+    elif there_exists(['piano']):
+        speak('Yes, I can play piano.')
+        winsound.Beep(200, 500)
+        winsound.Beep(250, 500)
+        winsound.Beep(300, 500)
+        winsound.Beep(350, 500)
+        winsound.Beep(400, 500)
+        winsound.Beep(450, 500)
+        winsound.Beep(500, 500)
+        winsound.Beep(550, 500)
+
+        time.sleep(6)
+
+    elif (('open' in command or 'turn on' in command) and 'camera' in command) or (
+            ('click' in command or 'take' in command) and ('photo' in command or 'pic' in command)):
+        speak("Opening camera")
+        cam = cv2.VideoCapture(0)
+
+        cv2.namedWindow("test")
+
+        img_counter = 0
+        speak('say click, to click photo.....and if you want to turn off the camera, say turn off the camera')
+
+        while True:
+            ret, frame = cam.read()
+            if not ret:
+                print("failed to grab frame")
+                speak('failed to grab frame')
+                break
+            cv2.imshow("test", frame)
+
+            query3 = takeCommand().lower()
+            k = cv2.waitKey(1)
+
+            if 'click' in query3 or ('take' in query3 and 'photo' in query3):
+                speak('Be ready!...... 3.....2........1..........')
+                pyautogui.press('space')
+                img_name = "opencv_frame_{}.png".format(img_counter)
+                cv2.imwrite(img_name, frame)
+                print("{} written!".format(img_name))
+                speak('{} written!'.format(img_name))
+                img_counter += 1
+            elif 'escape' in query3 or 'off' in query3 or 'close' in query3:
+                pyautogui.press('esc')
+                print("Escape hit, closing...")
+                speak('Turning off the camera')
+                break
+            elif k % 256 == 27:
+                # ESC pressed
+                print("Escape hit, closing...")
+                break
+            elif k % 256 == 32:
+
+                # SPACE pressed
+                img_name = "opencv_frame_{}.png".format(img_counter)
+                cv2.imwrite(img_name, frame)
+                print("{} written!".format(img_name))
+                speak('{} written!'.format(img_name))
+                img_counter += 1
+            elif 'exit' in query3 or 'stop' in query3 or 'bye' in query3:
+                speak('Please say, turn off the camera or press escape button before giving any other command')
+            else:
+                speak('I did not understand what did you say or you entered a wrong key.')
+
+        cam.release()
+
+        cv2.destroyAllWindows()
+
+    elif there_exists(["log off", "sign out", "log out", "stop", "shut down", "exit", "bye"]):
+        talk('Please give the review. It will help me to improve my performance.')
+        select_review()
+
+    elif 'screenshot' in command:
+        speak('Please go on the screen whose screenshot you want to take, after 5 seconds I will take screenshot')
+        time.sleep(4)
+        speak('Taking screenshot....3........2.........1.......')
+        pyautogui.screenshot('screenshot_by_r1.png')
+        speak('The screenshot is saved as screenshot_by_r1.png')
+
+    elif 'minimise' in command and 'screen' in command:
+        pyautogui.moveTo(1770, 0)
+        pyautogui.click()
+
+    elif 'increase' in command and ('volume' in command or 'sound' in command):
+        pyautogui.press('volumeup')
+
+    elif 'decrease' in command and ('volume' in command or 'sound' in command):
+        pyautogui.press('volumedown')
+
+    elif 'capslock' in command or ('caps' in command and 'lock' in command):
+        pyautogui.press('capslock')
+
+    elif 'mute' in command:
+        pyautogui.press('volumemute')
+
+    elif 'currency' in command and 'conver' in command:
+        speak(
+            'I can convert, US dollar into indian rupee, and indian rupee into US dollar. Do you want to continue it?')
+        query4 = takeCommand().lower()
+        if 'y' in query4 or 'sure' in query4 or 'of course' in query4:
+            speak('which conversion you want to do? US dollar to indian rupee, or indian rupee to US dollar?')
+            query5 = takeCommand().lower()
+            if ('dollar' in query5 or 'US' in query5) and ('to india' in query5 or 'to rupee' in query5):
+                speak('Enter US Dollar')
+                USD = float(input("Enter United States Dollar (USD):"))
+                INR = USD * 74.8
+                inr = "{:.4f}".format(INR)
+                print(f"{USD} US Dollar is equal to {inr} indian rupee.")
+                speak(f'{USD} US Dollar is equal to {inr} indian rupee.')
+                speak("If you again want to do currency conversion then say, 'convert currency' ")
+            elif ('india' in query5 or 'rupee' in query5) and (
+                    'to US' in query5 or 'to dollar' in query5 or 'to US dollar'):
+                speak('Enter Indian Rupee')
+                INR = float(input("Enter Indian Rupee (INR):"))
+                USD = INR / 74.8
+                usd = "{:.3f}".format(USD)
+                print(f"{INR} indian rupee is equal to {usd} US Dollar.")
+                speak(f'{INR} indian rupee is equal to {usd} US Dollar.')
+                speak("If you again want to do currency conversion then say, 'convert currency' ")
+            else:
+                speak(
+                    "I cannot understand what did you say. If you want to convert currency just say 'convert currency'")
+        else:
+            print('ok Thank you')
+
+    elif 'online shop' in command or (
+            ('can' in command or 'want' in command or 'do' in command or 'could' in command) and 'shop' in command) or (
+            'let' in command and 'shop' in command):
+        speak('From which online shopping website, you want to shop? Amazon, flipkart, snapdeal or naaptol?')
+        query6 = takeCommand().lower()
+        if 'amazon' in query6:
+            webbrowser.open('https://www.amazon.com')
+            time.sleep(10)
+        elif 'flip' in query6:
+            webbrowser.open('https://www.flipkart.com')
+            time.sleep(10)
+        elif 'snap' in query6:
+            webbrowser.open('https://www.snapdeal.com')
+            time.sleep(10)
+        elif 'na' in query6:
+            webbrowser.open('https://www.naaptol.com')
+            time.sleep(10)
+        else:
+            speak('Sorry , you have to search in browser as this shopping website is not reachable for me.')
+
     else:
         # talk('Please repeat again.')
         return 0
 
+
+def select_review():
+    global root3
+    global vs
+    global type_of_review
+    root3 = Tk()
+    root3.title("Select an option")
+
+    vs = IntVar()
+    string = "Are you satisfied with my performance?"
+    msgbox = Message(root3, text=string)
+    msgbox.config(bg="lightgreen", font="(20)")
+    msgbox.grid(row=0, column=0)
+    rs1 = Radiobutton(root3, text="Very Satisfied", font="(20)", value=1, variable=vs).grid(row=1, column=0, sticky=W)
+    rs2 = Radiobutton(root3, text="Satisfied", font="(20)", value=2, variable=vs).grid(row=2, column=0, sticky=W)
+    rs3 = Radiobutton(root3, text="Neither Satisfied Nor Dissatisfied", font="(20)", value=3, variable=vs).grid(row=3,
+                                                                                                                column=0,
+                                                                                                                sticky=W)
+    rs4 = Radiobutton(root3, text="Dissatisfied", font="(20)", value=4, variable=vs).grid(row=4, column=0, sticky=W)
+    rs5 = Radiobutton(root3, text="Very Dissatisfied", font="(20)", value=5, variable=vs).grid(row=5, column=0,
+                                                                                               sticky=W)
+    rs6 = Radiobutton(root3, text="I don't want to give review", font="(20)", value=6, variable=vs).grid(row=6,
+                                                                                                         column=0,
+                                                                                                         sticky=W)
+
+    bs = Button(root3, text="Submit", font="(20)", activebackground="yellow", activeforeground="green", command=select1)
+    bs.grid(row=7, columnspan=2)
+
+    root3.mainloop()
+
+def select1():
+    global vs
+    global root3
+    global type_of_review
+
+    if vs.get() == 1:
+        message.showinfo(" ","Thank you for your review!!")
+        review = "Very Satisfied"
+        type_of_review = "Positive"
+        root3.destroy()
+    elif vs.get() == 2:
+        message.showinfo(" ","Thank you for your review!!")
+        review = "Satisfied"
+        type_of_review = "Positive"
+        root3.destroy()
+    elif vs.get() == 3:
+        message.showinfo(" ","Thank you for your review!!!!")
+        review = "Neither Satisfied Nor Dissatisfied"
+        type_of_review = "Neutral"
+        root3.destroy()
+    elif vs.get() == 4:
+        message.showinfo(" ","Thank you for your review!!")
+        review = "Dissatisfied"
+        type_of_review = "Negative"
+        root3.destroy()
+    elif vs.get() == 5:
+        message.showinfo(" ","Thank you for your review!!")
+        review = "Very Dissatisfied"
+        type_of_review = "Negative"
+        root3.destroy()
+    elif vs.get() == 6:
+        message.showinfo(" ","    Ok    ")
+        review = "I do not want to give review"
+        type_of_review = "No review"
+        root3.destroy()
+    try:
+        print('Thanks for your review')
+        talk("Thanks for your review")
+        talk("Ok , your pc will log off in 10 sec make sure you exit from all applications")
+        sys.exit()
+    except Exception as e:
+        pass
 
 def there_exists(terms):
     for term in terms:
@@ -1176,6 +1534,7 @@ def convert_language(audio_string, language_code):
 
 
 def startspeakeithme():
+    # detect_face()
     wishMe()
     choosenLangcode = choose_language()
     choosenLangcode = choosenLangcode.lower()
@@ -1193,6 +1552,54 @@ def startspeakeithme():
 def stopspeacking():
     talk("Ok , your pc will log off in 10 sec make sure you exit from all applications")
     sys.exit()
+
+
+def alarm():
+    root = Tk()
+    hrs = StringVar()
+    mins = StringVar()
+    secs = StringVar()
+    root.title('R1.0 Alarm-Clock')
+    speak('Please enter the time in the format hour, minutes and seconds. When the alarm should rang?')
+    speak('Please enter the time greater than the current time')
+
+    def setalarm():
+        alarmtime = f"{hrs.get()}:{mins.get()}:{secs.get()}"
+        print(alarmtime)
+        if alarmtime != "::":
+            alarmclock(alarmtime)
+        else:
+            speak('You have not entered the time.')
+
+    def alarmclock(alarmtime):
+        print("am in alaramclock fun")
+        time_now = datetime.datetime.now().strftime("%H:%M:%S")
+        print(time_now)
+        while True:
+            time.sleep(1)
+            time_now = datetime.datetime.now().strftime("%H:%M:%S")
+            print(time_now)
+            if time_now == alarmtime:
+                Wakeup = Label(root, font=('arial', 20, 'bold'), text="Wake up! Wake up! Wake up", bg="DodgerBlue2",
+                               fg="white").grid(row=6, columnspan=3)
+                talk("Wake up, Have a good day")
+                print("Wake up!")
+                mixer.init()
+                mixer.music.load(r'Music/Runaway-Aurora.mp3')
+                mixer.music.play()
+                break
+        talk('you can click on close icon to close the alarm window.')
+
+    greet = Label(root, font=('arial', 20, 'bold'), text="Take a short nap!").grid(row=1, columnspan=3)
+    hrbtn = Entry(root, textvariable=hrs, width=5, font=('arial', 20, 'bold'))
+    hrbtn.grid(row=2, column=1)
+    minbtn = Entry(root, textvariable=mins, width=5, font=('arial', 20, 'bold')).grid(row=2, column=2)
+    secbtn = Entry(root, textvariable=secs, width=5, font=('arial', 20, 'bold')).grid(row=2, column=3)
+    setbtn = Button(root, text="set alarm", command=setalarm, bg="DodgerBlue2", fg="white",
+                    font=('arial', 20, 'bold')).grid(row=4, columnspan=3)
+    timeleft = Label(root, font=('arial', 20, 'bold'))
+    timeleft.grid()
+    mainloop()
 
 
 #   subprocess.call(["sleep", "/l"])
