@@ -1030,11 +1030,11 @@ def run_alexa(choosenLangCode):
                 "includeDetailedScans": 1,
                 "associatedType": "STANDARD_MPS",
                 "masterTrackingNumberInfo": {
-                    "shipDateEnd": "2022-03-15",
-                    "shipDateBegin": "2022-03-01",
+                    "shipDateEnd": "2020-04-01",
+                    "shipDateBegin": "2020-03-29",
                     "trackingNumberInfo": {
                         "trackingNumberUniqueId": "245822~" + tracking_number + "~FDEG",
-                        "carrierCode": "FDXG",
+                        "carrierCode": "FDXE",
                         "trackingNumber": tracking_number
                     }
                 },
@@ -1113,7 +1113,7 @@ def run_alexa(choosenLangCode):
             #stopspeacking()
         run_alexa(choosenLangCode)
 
-    elif there_exists(["play"]):
+    elif there_exists(["play youtube","utube"]):
         song = command.replace('play', '')
         talk('playing' + song)
         pywhatkit.playonyt(song)  # to play command from youtube
@@ -1413,9 +1413,122 @@ def run_alexa(choosenLangCode):
         else:
             speak('Sorry , you have to search in browser as this shopping website is not reachable for me.')
 
+    elif 'tic tac toe' in command or 'game' in command:
+        speak(
+            'I have tic tac toe game for two players,....mario, and dyno games for single player. Which one of these '
+            '3 games you want to play?')
+        query7 = takeCommand().lower()
+        if ('you' in query7 and 'play' in query7 and 'with' in query7) and (
+                'you' in query7 and 'play' in query7 and 'me' in query7):
+            speak('Sorry sir, I cannot play this game with you.')
+            speak('Do you want to continue it?')
+            query = takeCommand().lower()
+            try:
+                if 'y' in query or 'sure' in query:
+                    root = Tk()
+                    root.title("TIC TAC TOE  (By Uma)")
+                    b = [[0, 0, 0],
+                         [0, 0, 0],
+                         [0, 0, 0]]
+                    states = [[0, 0, 0],
+                              [0, 0, 0],
+                              [0, 0, 0]]
+                    for i in range(3):
+                        for j in range(3):
+                            b[i][j] = Button(font=("Arial", 60), width=4, bg='powder blue',
+                                             command=lambda r=i, c=j: callback(r, c))
+                            b[i][j].grid(row=i, column=j)
+                    player = 'X'
+                    stop_game = False
+                    mainloop()
+                else:
+                    speak('ok sir')
+            except Exception as e:
+                # print(e)
+                time.sleep(3)
+                print('I am sorry sir. There is some problem in loading the game. So I cannot open it.')
+        elif 'tic' in query7 or 'tac' in query7:
+            try:
+                root = Tk()
+                root.title("TIC TAC TOE  (By uma)")
+                b = [[0, 0, 0],
+                     [0, 0, 0],
+                     [0, 0, 0]]
+                states = [[0, 0, 0],
+                          [0, 0, 0],
+                          [0, 0, 0]]
+                for i in range(3):
+                    for j in range(3):
+                        b[i][j] = Button(font=("Arial", 60), width=4, bg='powder blue',
+                                         command=lambda r=i, c=j: callback(r, c))
+                        b[i][j].grid(row=i, column=j)
+                player = 'X'
+                stop_game = False
+                mainloop()
+            except Exception as e:
+                # print(e)
+                time.sleep(3)
+                speak('I am sorry sir. There is some problem in loading the game. So I cannot open it.')
     else:
         # talk('Please repeat again.')
         return 0
+
+
+    def callback(r, c):
+        global player
+
+        if player == 'X' and states[r][c] == 0 and stop_game == False:
+            b[r][c].configure(text='X', fg='blue', bg='white')
+            states[r][c] = 'X'
+            player = 'O'
+
+        if player == 'O' and states[r][c] == 0 and stop_game == False:
+            b[r][c].configure(text='O', fg='red', bg='yellow')
+            states[r][c] = 'O'
+            player = 'X'
+        check_for_winner()
+
+
+    def check_for_winner():
+        global stop_game
+        global root
+        for i in range(3):
+            if states[i][0] == states[i][1] == states[i][2] != 0:
+                b[i][0].config(bg='grey')
+                b[i][1].config(bg='grey')
+                b[i][2].config(bg='grey')
+
+                stop_game = True
+
+                root.destroy()
+
+        for i in range(3):
+            if states[0][i] == states[1][i] == states[2][i] != 0:
+                b[0][i].config(bg='grey')
+                b[1][i].config(bg='grey')
+                b[2][i].config(bg='grey')
+
+                stop_game = True
+
+                root.destroy()
+
+            if states[0][0] == states[1][1] == states[2][2] != 0:
+                b[0][0].config(bg='grey')
+                b[1][1].config(bg='grey')
+                b[2][2].config(bg='grey')
+
+                stop_game = True
+
+                root.destroy()
+
+            if states[2][0] == states[1][1] == states[0][2] != 0:
+                b[2][0].config(bg='grey')
+                b[1][1].config(bg='grey')
+                b[0][2].config(bg='grey')
+
+                stop_game = True
+
+                root.destroy()
 
 
 def select_review():
