@@ -1,8 +1,6 @@
-import datetime
 import os
 import re
 import sys  # to get exit
-import time
 import tkinter as tk
 import webbrowser
 import winsound
@@ -15,20 +13,64 @@ import gtts as gt
 import json
 import pyautogui
 import pyjokes
-import pyttsx3  # used to convert text to speech
 import pywhatkit  # to play you tube music
 import requests
 import speech_recognition as sr  # used to convert human speech to text
 import wikipedia
 from GoogleNews import GoogleNews
+from PIL import ImageTk
 from googletrans import Translator
-from pygame import mixer
+import pyttsx3
+# from pyjsparser.parser import true, false
 
 from weather import *
-
 # import messagebox from tkinter module
+# from alarmclock import *
+import tkinter as tknew
+import time
+from PIL import ImageTk
+from tkinter import ttk, messagebox
+from playsound import playsound
+import multiprocessing
+from datetime import datetime
+from threading import *
+import datetime
 
 global query
+
+# Hours List.
+hours_list = ['00', '01', '02', '03', '04', '05', '06', '07',
+              '08', '09', '10', '11', '12', '13', '14', '15',
+              '16', '17', '18', '19', '20', '21', '22', '23', '24']
+
+# Minutes List.
+minutes_list = ['00', '01', '02', '03', '04', '05', '06', '07',
+                '08', '09', '10', '11', '12', '13', '14', '15',
+                '16', '17', '18', '19', '20', '21', '22', '23',
+                '24', '25', '26', '27', '28', '29', '30', '31',
+                '32', '33', '34', '35', '36', '37', '38', '39',
+                '40', '41', '42', '43', '44', '45', '46', '47',
+                '48', '49', '50', '51', '52', '53', '54', '55',
+                '56', '57', '58', '59']
+
+# Ringtones list.
+ringtones_list = ['Best_wake_up', 'Cuckoo_Clock', 'Runaway_Aurora', 'nice_wake_up', 'romantic',
+                  'twirling_intime', 'wakeup_alarm_tone']
+
+# Ringtone Paths.
+ringtones_path = {
+    'Best_wake_up': 'Ringtones/Best-wake-up Sound.mp3',
+    'Cuckoo_Clock': 'Ringtones/Cuckoo-Clock.mp3',
+    'Runaway_Aurora': 'Ringtones/Runaway-Aurora.mp3',
+    'nice_wake_up': 'Ringtones/nice_wake_up.mp3',
+    'romantic': 'Ringtones/romantic.mp3',
+    'twirling_intime': 'Ringtones/twirling_intime.mp3',
+    'wakeup_alarm_tone': 'Ringtones/wakeup_alarm_tone.mp3'
+}
+
+shipURL = "https://apis-sandbox.fedex.com/ship/v1/shipments"
+ratesURL = "https://apis-sandbox.fedex.com/rate/v1/rates/quotes"
+trackingURL = "https://apis-sandbox.fedex.com/track/v1/associatedshipments"
 
 obj = tk.Tk()
 obj.title("Contec Voice Assistant")
@@ -41,6 +83,12 @@ translator = Translator()
 listener = sr.Recognizer()  # initialization
 engine = pyttsx3.init()  # used to talk
 voices = engine.getProperty('voices')
+
+
+def there_exists(terms):
+    for term in terms:
+        if term in command:
+            return True
 
 
 def getCorrectPath(relative_path):
@@ -58,7 +106,7 @@ def talk(command):
     #  voices = engine.getProperty('voices')
     # setter method .[0]=male voice and
     # [1]=female voice in set Property.
-    engine.setProperty('voice', voices[0].id)
+    engine.setProperty('voice', voices[1].id)
     # Method for the speaking of the the assistant
     engine.say(command)
     engine.setProperty('rate', 200)
@@ -66,41 +114,6 @@ def talk(command):
     # Blocks while processing all the currently
     # queued commands
     engine.runAndWait()
-
-
-def detect_face():
-    cascPath = os.path.dirname(cv2.__file__) + "/data/haarcascade_frontalface_default.xml"
-    faceCascade = cv2.CascadeClassifier(cascPath)
-    video_capture = cv2.VideoCapture(0)
-
-    while True:
-        # Capture frame-by-frame
-        ret, frames = video_capture.read()
-
-        gray = cv2.cvtColor(frames, cv2.COLOR_BGR2GRAY)
-
-        faces = faceCascade.detectMultiScale(
-            gray,
-            scaleFactor=1.1,
-            minNeighbors=5,
-            minSize=(30, 30),
-            flags=cv2.CASCADE_SCALE_IMAGE
-        )
-
-        # Draw a rectangle around the faces
-        for (x, y, w, h) in faces:
-            cv2.rectangle(frames, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-        # Display the resulting frame
-        cv2.imshow('Video', frames)
-        speak("detecting face")
-        print("Detecting face.....")
-        time.sleep(10)
-        pyautogui.press('q')
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    video_capture.release()
-    cv2.destroyAllWindows()
 
 
 def wishMe():
@@ -458,6 +471,7 @@ def close_window():
 def run_alexa(choosenLangCode):
     global command
     command = listen_command(choosenLangCode)
+    print('printing user said value')
     print(command)
 
     if is_weather_search_action(command):
@@ -558,7 +572,8 @@ def run_alexa(choosenLangCode):
                             confirmCreateRequest = multi_talk_command()
                             if 'yes' in confirmCreateRequest or 's' in confirmCreateRequest or 'z' in confirmCreateRequest or 'zee' in confirmCreateRequest or 'ss' in confirmCreateRequest or 'sí' in confirmCreateRequest or 'Oui' in confirmCreateRequest:
                                 print('BenchRequest Service..')
-                                benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                                # benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                                benchReqUrl = "http://dev.api.vulcan.contecprod.com/api/BenchRequests/BenchRequestSave"
                                 benchData = {"id": 0, "requestorId": 0, "requesterName": requesterName,
                                              "stationId": 0, "stationName": stationName, "siteId": 1004, "statusId": 3,
                                              "categoryId": 1, "subcategoryId": 1, "assigneeId": 7668, "priority": 0,
@@ -608,7 +623,8 @@ def run_alexa(choosenLangCode):
                                 confirmCreateRequest = multi_talk_command()
                                 if 'yes' in confirmCreateRequest or 's' in confirmCreateRequest or 'z' in confirmCreateRequest or 'zee' in confirmCreateRequest or 'ss' in confirmCreateRequest or 'sí' in confirmCreateRequest or 'Oui' in confirmCreateRequest:
                                     print('BenchRequest Service..')
-                                    benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                                    benchReqUrl = "http://dev.api.vulcan.contecprod.com/api/BenchRequests/BenchRequestSave"
+                                    # benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
                                     benchData = {"id": 0, "requestorId": 0, "requesterName": requesterName,
                                                  "stationId": 0, "stationName": stationName, "siteId": 1004,
                                                  "statusId": 3,
@@ -755,7 +771,8 @@ def run_alexa(choosenLangCode):
                             confirmCreateRequest = multi_talk_command_tamil(choosenLangCode)
                             if 'yes' in confirmCreateRequest or 'हां' in confirmCreateRequest or 'theek hai' in confirmCreateRequest or 'ठीक है' in confirmCreateRequest or 'சரி' in confirmCreateRequest or 'ஆம்' in confirmCreateRequest or 'haan' in confirmCreateRequest:
                                 print('BenchRequest Service..')
-                                benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                                # benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                                benchReqUrl = "http://dev.api.vulcan.contecprod.com/api/BenchRequests/BenchRequestSave"
                                 benchData = {"id": 0, "requestorId": 0, "requesterName": command_reqname,
                                              "stationId": 0, "stationName": command_stnname, "siteId": 1004,
                                              "statusId": 3,
@@ -881,7 +898,8 @@ def run_alexa(choosenLangCode):
                             confirmCreateRequest = multi_talk_command()
                             if 'yes' in confirmCreateRequest or 's' in confirmCreateRequest or 'z' in confirmCreateRequest or 'zee' in confirmCreateRequest or 'ss' in confirmCreateRequest or 'sí' in confirmCreateRequest or 'Oui' in confirmCreateRequest:
                                 print('BenchRequest Service..')
-                                benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                                # benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                                benchReqUrl = "http://dev.api.vulcan.contecprod.com/api/BenchRequests/BenchRequestSave"
                                 benchData = {"id": 0, "requestorId": 0, "requesterName": requesterName,
                                              "stationId": 0, "stationName": stationName, "siteId": 1004, "statusId": 3,
                                              "categoryId": 1, "subcategoryId": 1, "assigneeId": 7668, "priority": 0,
@@ -931,7 +949,8 @@ def run_alexa(choosenLangCode):
                                 confirmCreateRequest = multi_talk_command()
                                 if 'yes' in confirmCreateRequest or 's' in confirmCreateRequest or 'z' in confirmCreateRequest or 'zee' in confirmCreateRequest or 'ss' in confirmCreateRequest or 'sí' in confirmCreateRequest or 'Oui' in confirmCreateRequest:
                                     print('BenchRequest Service..')
-                                    benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                                    # benchReqUrl = "http://localhost:4301/api/BenchRequests/BenchRequestSave"
+                                    benchReqUrl = "http://dev.api.vulcan.contecprod.com/api/BenchRequests/BenchRequestSave"
                                     benchData = {"id": 0, "requestorId": 0, "requesterName": requesterName,
                                                  "stationId": 0, "stationName": stationName, "siteId": 1004,
                                                  "statusId": 3,
@@ -981,139 +1000,7 @@ def run_alexa(choosenLangCode):
                                     talk(destini_lang15)
         run_alexa(choosenLangCode)
 
-
-    elif there_exists(["fedex", "tracking", "delivery", "where is package", "Shipment details"]):
-        print("Am glad to help you on this, can you please provide me tracking number to get the status")
-        talk("Am glad to help you on this, can you please provide me tracking number to get the status")
-        print("sample tracking 123456789012/ 858488600850")
-        print("122816215025810 = Delivered")
-        print("020207021381215 = Picked Up")
-        print("403934084723025 = Arrived at FedEx location")
-        print("920241085725456 = At local FedEx facility")
-        tracking_number = listen_trac_command()
-        audio_tra7 = "I am confirming the details: the given tracking number is"
-        print(audio_tra7)
-        talk(audio_tra7)
-        talk(tracking_number)
-        print(tracking_number)
-        tracking_number = re.sub(r'(\d)\s+(\d)', r'\1\2', tracking_number)
-        print(tracking_number)
-        tra_string11 = "All these details are okay? Shall i proceed to create? please confirm yes or no"
-        print(tra_string11)
-        talk(tra_string11)
-        isconfirm = listen_trac_command()
-        print(isconfirm)
-        if 'yes' in isconfirm or 's' in isconfirm or 'z' in isconfirm or 'zee' in isconfirm or 'ss' in isconfirm or 'sí' in isconfirm or 'Oui' in isconfirm:
-            print('Fedex track api loading ...')
-            # fedex authorization
-            authurl = "https://apis-sandbox.fedex.com/oauth/token"
-
-            # payload = "grant_type=client_credentials&client_id=l7c83fd3c68c8049df93b5d72b8274641d&client_secret=2e09a50ac5fc428a9d24a891f919b1a5"
-
-            payload = "grant_type=client_credentials&client_id=l7c302cd75cadf47b4aaced9a072fb8fb0&client_secret=e196e9e73338479d8e78ff44687e7d22"
-
-            headers = {
-                'Content-Type': "application/x-www-form-urlencoded"
-            }
-            authresponse = requests.request("POST", authurl, data=payload, headers=headers)
-
-            # print(authresponse.text)
-            print(json.loads(authresponse.text).get('access_token'))
-            print(json.loads(authresponse.text)['access_token'])
-            accessToken = json.loads(authresponse.text)['access_token']
-            # print(accessToken)
-            # time.sleep(5)
-
-            url = "https://apis-sandbox.fedex.com/track/v1/associatedshipments"
-
-            input1 = {
-                "includeDetailedScans": 1,
-                "associatedType": "STANDARD_MPS",
-                "masterTrackingNumberInfo": {
-                    "shipDateEnd": "2020-04-01",
-                    "shipDateBegin": "2020-03-29",
-                    "trackingNumberInfo": {
-                        "trackingNumberUniqueId": "245822~" + tracking_number + "~FDEG",
-                        "carrierCode": "FDXE",
-                        "trackingNumber": tracking_number
-                    }
-                },
-                "pagingDetails": {
-                    "resultsPerPage": 56,
-                    "pagingToken": "38903279038"
-                }
-            }
-
-            headers = {
-                'Content-Type': "application/json",
-                'X-locale': "en_US",
-                'Authorization': "Bearer " + accessToken
-            }
-            print(headers)
-            payload = json.dumps(input1)  # 'input' refers to JSON Payload
-            print('after json_dumps')
-            print(payload)
-            response = requests.request("POST", url, data=payload, headers=headers)
-            print(response.text)
-            print('Fedex Service call in progress..')
-            talk('Please Wait...Fedex Service call in progress..')
-            # responeData = requests.request("POST", fedexReqUrl, data=fedexData, headers=headers)
-            print("response.json()...................")
-            responseData = response.text
-            # print(responseData)
-            # print(json.loads(responseData)['output'])
-            # print(json.loads(responseData)['output']['completeTrackResults'])
-            # outputres = json.loads(responseData)['output']['completeTrackResults'][0]['trackResults']
-            # print(outputres)
-            tracking_code = json.loads(responseData)['output']['completeTrackResults'][0]['trackResults'][0]['error'][
-                'code']
-            tracking_msg = json.loads(responseData)['output']['completeTrackResults'][0]['trackResults'][0]['error'][
-                'message']
-            if response.status_code == 200:
-                tra_string12 = 'Successfully located.And the message has been received from fedex is'
-                print(tra_string12)
-                talk(tra_string12)
-                print(tracking_msg)
-                talk(tracking_msg)
-                tra_string112 = 'Thanks for using R1.0'
-                print(tra_string112)
-                talk(tra_string112)
-            elif response.status_code == 400:
-                tra_err = 'Sorry! not able to locate Please provide a valid reference/associated type'
-                print(tra_err)
-                talk(tra_err)
-            elif response.status_code == 401:
-                tra_err = 'Access token expired. Please modify your request and try again.'
-                print(tra_err)
-                talk(tra_err)
-            elif response.status_code == 403:
-                tra_err = 'We could not authorize your credentials. Please check your permissions and try again'
-                print(tra_err)
-                talk(tra_err)
-            elif response.status_code == 404:
-                tra_err = 'The resource you requested is no longer available. Please modify your request and try again'
-                print(tra_err)
-                talk(tra_err)
-            elif response.status_code == 500:
-                tra_err = 'We encountered an unexpected error and are working to resolve the issue. We apologize for any inconvenience. Please check back at a later time'
-                print(tra_err)
-                talk(tra_err)
-            elif response.status_code == 503:
-                tra_err = 'The service is currently unavailable and we are working to resolve the issue. We apologize for any inconvenience. Please check back at a later time.'
-                print(tra_err)
-                talk(tra_err)
-            else:
-                tra_string13 = 'Thanks for using R1.0'
-                print(tra_string13)
-                talk(tra_string13)
-            #stopspeacking()
-        else:
-            talk("Pardon! can you please come again the same")
-            listen_trac_command()
-            #stopspeacking()
-        run_alexa(choosenLangCode)
-
-    elif there_exists(["play youtube","utube"]):
+    elif there_exists(["play youtube", "utube"]):
         song = command.replace('play', '')
         talk('playing' + song)
         pywhatkit.playonyt(song)  # to play command from youtube
@@ -1245,10 +1132,10 @@ def run_alexa(choosenLangCode):
         print(*a[1:5], sep=',')
 
     elif there_exists(['alarm']):
-        alarm()
+        alarm(obj)
 
-    elif there_exists(['hi', 'wake', 'hello', 'rithik', 'R1.0', 'R1', 'Hey', 'aur 1.0', 'uma']):
-        speak('yes am here..Tell me how can i help you')
+    # elif there_exists(['hi', 'wake', 'hello', 'rithik', 'R1.0', 'R1', 'Hey', 'aur 1.0', 'uma']):
+    # speak('yes am here..Tell me how can i help you')
 
     elif there_exists(['change voice', 'change your voice']):
         engine.setProperty('voice', voices[1].id)
@@ -1256,13 +1143,13 @@ def run_alexa(choosenLangCode):
         query1 = takeCommand().lower()
         if 'y' in query1 or 'sure' in query1 or 'of course' in query1:
             speak('Great. I will keep using this voice.')
-            engine.setProperty('voice', voices[1].id)
+            engine.setProperty('voice', voices[0].id)
         elif 'n' in query1:
             speak('Ok. I am back to my other voice.')
-            engine.setProperty('voice', voices[0].id)
+            engine.setProperty('voice', voices[1].id)
         else:
             speak('Sorry, I am having trouble understanding. I am back to my other voice.')
-            engine.setProperty('voice', voices[0].id)
+            engine.setProperty('voice', voices[1].id)
 
     elif there_exists(['increase', 'decrease', 'change', 'minimize', 'maximize']) and 'brightness' in command:
         speak('At what percent should I kept the brightness, 25, 50, 75 or 100?')
@@ -1413,122 +1300,604 @@ def run_alexa(choosenLangCode):
         else:
             speak('Sorry , you have to search in browser as this shopping website is not reachable for me.')
 
-    elif 'tic tac toe' in command or 'game' in command:
-        speak(
-            'I have tic tac toe game for two players,....mario, and dyno games for single player. Which one of these '
-            '3 games you want to play?')
-        query7 = takeCommand().lower()
-        if ('you' in query7 and 'play' in query7 and 'with' in query7) and (
-                'you' in query7 and 'play' in query7 and 'me' in query7):
-            speak('Sorry sir, I cannot play this game with you.')
-            speak('Do you want to continue it?')
-            query = takeCommand().lower()
-            try:
-                if 'y' in query or 'sure' in query:
-                    root = Tk()
-                    root.title("TIC TAC TOE  (By Uma)")
-                    b = [[0, 0, 0],
-                         [0, 0, 0],
-                         [0, 0, 0]]
-                    states = [[0, 0, 0],
-                              [0, 0, 0],
-                              [0, 0, 0]]
-                    for i in range(3):
-                        for j in range(3):
-                            b[i][j] = Button(font=("Arial", 60), width=4, bg='powder blue',
-                                             command=lambda r=i, c=j: callback(r, c))
-                            b[i][j].grid(row=i, column=j)
-                    player = 'X'
-                    stop_game = False
-                    mainloop()
-                else:
-                    speak('ok sir')
-            except Exception as e:
-                # print(e)
-                time.sleep(3)
-                print('I am sorry sir. There is some problem in loading the game. So I cannot open it.')
-        elif 'tic' in query7 or 'tac' in query7:
-            try:
-                root = Tk()
-                root.title("TIC TAC TOE  (By uma)")
-                b = [[0, 0, 0],
-                     [0, 0, 0],
-                     [0, 0, 0]]
-                states = [[0, 0, 0],
-                          [0, 0, 0],
-                          [0, 0, 0]]
-                for i in range(3):
-                    for j in range(3):
-                        b[i][j] = Button(font=("Arial", 60), width=4, bg='powder blue',
-                                         command=lambda r=i, c=j: callback(r, c))
-                        b[i][j].grid(row=i, column=j)
-                player = 'X'
-                stop_game = False
-                mainloop()
-            except Exception as e:
-                # print(e)
-                time.sleep(3)
-                speak('I am sorry sir. There is some problem in loading the game. So I cannot open it.')
+
+    elif there_exists(["fedex rates", "rates", "Rate and Transit times", "Transit times"]):
+        print("I Am glad to help you on this, can you please provide me tracking number to get the status")
+        talk(
+            "I Am glad to help you on providing rate and transit times, can you please provide me your account number to get the status")
+        print("740561073")
+        account_number = listen_trac_command()
+        audio_tra7 = "I am confirming the details: the given account number is"
+        print(audio_tra7)
+        talk(audio_tra7)
+        talk(account_number)
+        print(account_number)
+        account_number = re.sub(r'(\d)\s+(\d)', r'\1\2', account_number)
+        print(account_number)
+        print("-----*-----*-----*-----*-----*-----*")
+
+        talk('could you please specify pickupType?')
+        print("https://developer.fedex.com/api/en-us/guides/api-reference.html#pickuptypes")
+        print("sample as DROPOFF_AT_FEDEX_LOCATION")
+        talk("you can refer the available pickupType from this website")
+        webbrowser.open_new_tab("https://developer.fedex.com/api/en-us/guides/api-reference.html#pickuptypes")
+        time.sleep(5)
+        pickupType1 = listen_trac_command()
+        pickupType2 = pickupType1.upper()
+        print(pickupType2)
+        ls = pickupType2.split()
+        print(ls)
+        joinedpickupType2 = "_".join(ls)
+        print(joinedpickupType2)
+        pickupType = "DROPOFF_AT_FEDEX_LOCATION"
+        print("pickupType is ")
+        print(pickupType)
+        print("-----*-----*-----*-----*-----*-----*")
+
+        """
+        talk("I Am glad to help you on providing rate and transit times, can you please provide me your account number to get the status")
+        print("740561073")
+        account_number = listen_trac_command()
+        audio_tra7 = "I am confirming the details: the given account number is"
+        print(audio_tra7)
+        talk(audio_tra7)
+        talk(account_number)
+        print(account_number)
+        account_number = re.sub(r'(\d)\s+(\d)', r'\1\2', account_number)
+        print(account_number)
+        print("-----*-----*-----*-----*-----*-----*")
+
+        talk('could you please confirm returnTransitTimes is true or false?')
+        print("sample value is false")
+        returnTransitTimes = listen_trac_command()
+        if returnTransitTimes == "true":
+            returnTransitTimes = trueFun()
+        else:
+            returnTransitTimes = falseFun()
+        #returnTransitTimes = falseFun()
+        print("returnTransitTimes is")
+        print(returnTransitTimes)
+        print("-----*-----*-----*-----*-----*-----*")
+
+        talk('could you please confirm servicesNeededOnRateFailure is true or false?')
+        print("sample value is true")
+        servicesNeededOnRateFailure = listen_trac_command()
+        if servicesNeededOnRateFailure == "true":
+            servicesNeededOnRateFailure = trueFun()
+        else:
+            servicesNeededOnRateFailure = falseFun()
+        print("servicesNeededOnRateFailure is ")
+        print(servicesNeededOnRateFailure)
+        print("-----*-----*-----*-----*-----*-----*")
+
+        talk('could you please Specify service options whose combinations are to be considered when replying with below available services?')
+        print("SATURDAY_DELIVERY", "FREIGHT_GUARANTEE", "SMART_POST_ALLOWED_INDICIA", "SMARTPOST_HUB_ID")
+        talk("SATURDAY_DELIVERY" "FREIGHT_GUARANTEE" "SMART_POST_ALLOWED_INDICIA" "SMARTPOST_HUB_ID")
+        variableOptions1 = listen_trac_command()
+        print(variableOptions1)
+        variableOptions2 = variableOptions1.upper()
+        print(variableOptions2)
+        ls = variableOptions2.split()
+        print(ls)
+        joinedvariableOptions2 = "_".join(ls)
+        print(joinedvariableOptions2)
+        variableOptions = "FREIGHT_GUARANTEE"
+        print("variableOptions is" + variableOptions)
+        print("-----*-----*-----*-----*-----*-----*")
+
+        talk('could you please specify to control the order of the response data from the following anyone?')
+        print("COMMITASCENDING", "SERVICENAMETRADITIONAL", "COMMITDESCENDING")
+        talk("COMMITASCENDING" "SERVICENAMETRADITIONAL" "COMMITDESCENDING")
+        rateSortOrder1 = listen_trac_command()
+        print(rateSortOrder1)
+        rateSortOrder12 = rateSortOrder1.upper()
+        print(rateSortOrder12)
+        ls = rateSortOrder12.split()
+        print(ls)
+        joinedrateSortOrder2 = "".join(ls)
+        print(joinedrateSortOrder2)
+        print("rateSortOrder is " + joinedrateSortOrder2)
+        print("-----*-----*-----*-----*-----*-----*")
+
+        talk('could you please specify serviceType?')
+        print("https://developer.fedex.com/api/en-us/guides/api-reference.html#servicetypes")
+        print("sample as STANDARD_OVERNIGHT")
+        talk("you can refer the available servicetypes from this website")
+        webbrowser.open_new_tab("https://developer.fedex.com/api/en-us/guides/api-reference.html#servicetypes")
+        time.sleep(5)
+        serviceType1 = listen_trac_command()
+        serviceType2 = serviceType1.upper()
+        print(serviceType2)
+        ls = serviceType2.split()
+        print(ls)
+        joinedserviceType = "_".join(ls)
+        print(joinedserviceType)
+        serviceType = "STANDARD_OVERNIGHT"
+        print("serviceType is" + serviceType)
+        print("-----*-----*-----*-----*-----*-----*")
+
+        talk('can you please specify preferredCurrency?')
+        print("https://developer.fedex.com/api/en-us/guides/api-reference.html#currencycodes")
+        print("sample as USD")
+        talk("you can refer the available currencycodes from this website")
+        webbrowser.open_new_tab("https://developer.fedex.com/api/en-us/guides/api-reference.html#currencycodes")
+        time.sleep(5)
+        preferredCurrency1 = listen_trac_command()
+        preferredCurrency = preferredCurrency1.upper()
+        print(preferredCurrency)
+        preferredCurrency = "USD"
+        print(preferredCurrency)
+        print("-----*-----*-----*-----*-----*-----*")
+
+        talk('could you please specify pickupType?')
+        print("https://developer.fedex.com/api/en-us/guides/api-reference.html#pickuptypes")
+        print("sample as DROPOFF_AT_FEDEX_LOCATION")
+        talk("you can refer the available pickupType from this website")
+        webbrowser.open_new_tab("https://developer.fedex.com/api/en-us/guides/api-reference.html#pickuptypes")
+        time.sleep(5)
+        pickupType1 = listen_trac_command()
+        pickupType2 = pickupType1.upper()
+        print(pickupType2)
+        ls = pickupType2.split()
+        print(ls)
+        joinedpickupType2 = "_".join(ls)
+        print(joinedpickupType2)
+        pickupType = "DROPOFF_AT_FEDEX_LOCATION"
+        print("pickupType is ")
+        print(pickupType)
+        print("-----*-----*-----*-----*-----*-----*")
+
+        talk('could you please confirm documentShipment is true or false?')
+        print("sample value is false")
+        documentShipment = listen_trac_command()
+        print("documentShipment is " + documentShipment)
+        print("-----*-----*-----*-----*-----*-----*")
+
+        talk('could you please specify packagingType?')
+        print("https://developer.fedex.com/api/en-us/guides/api-reference.html#packagetypes")
+        print("sample as YOUR_PACKAGING")
+        talk("you can refer the available packagingType from this website")
+        webbrowser.open_new_tab("https://developer.fedex.com/api/en-us/guides/api-reference.html#packagetypes")
+        time.sleep(5)
+        packagingType1 = listen_trac_command()
+        packagingType12 = packagingType1.upper()
+        print(packagingType12)
+        ls = packagingType12.split()
+        print(ls)
+        joinedpackagingType12 = "_".join(ls)
+        print(joinedpackagingType12)
+        packagingType = "YOUR_PACKAGING"
+        print("packagingType is ")
+        print(packagingType)
+        print("-----*-----*-----*-----*-----*-----*")
+
+        talk('could you please confirm groupShipment is true or false?')
+        print("sample value is true")
+        groupShipment = listen_trac_command()
+        if groupShipment == "true":
+            groupShipment = trueFun()
+        else:
+            groupShipment = falseFun()
+        print("groupShipment is ")
+        print(groupShipment)
+        print("-----*-----*-----*-----*-----*-----*")
+
+        talk('could you please confirm groundShipment is true or false?')
+        print("sample value is false")
+        groundShipment = listen_trac_command()
+        if groundShipment == "true":
+            groundShipment = trueFun()
+        else:
+            groundShipment = falseFun()
+        print("groundShipment is ")
+        print(groundShipment)
+        print("-----*-----*-----*-----*-----*-----*")
+        
+        tra_string11 = "All these details are okay? Shall i proceed to check with rates quote service? please confirm yes or no"
+        print(tra_string11)
+        talk(tra_string11)
+        isconfirm = listen_trac_command()
+        print(isconfirm)
+        print("-----*-----*-----*-----*-----*-----*")
+"""
+        # if 'yes' in isconfirm or 's' in isconfirm or 'z' in isconfirm or 'zee' in isconfirm or 'ss' in isconfirm or 'sí' in isconfirm or 'Oui' in isconfirm:
+        accessToken = getAuth()
+
+        url = ratesURL
+
+        input1 = {
+            "accountNumber": {
+                "value": account_number
+            },
+            "requestedShipment": {
+                "shipper": {
+                    "address": {
+                        "postalCode": 65247,
+                        "countryCode": "US"
+                    }
+                },
+                "recipient": {
+                    "address": {
+                        "postalCode": 75063,
+                        "countryCode": "US"
+                    }
+                },
+                "pickupType": pickupType,
+                "rateRequestType": [
+                    "ACCOUNT",
+                    "LIST"
+                ],
+                "requestedPackageLineItems": [
+                    {
+                        "weight": {
+                            "units": "LB",
+                            "value": 10
+                        }
+                    }
+                ]
+            }
+        }
+        headers = getfedExHeaders(accessToken)
+        print(headers)
+        payload = json.dumps(input1)  # 'input' refers to JSON Payload
+        print('after json_dumps')
+        print(payload)
+        print("-----*-----*-----*-----*-----*-----*")
+        response = requests.request("POST", url, data=payload, headers=headers)
+        print(response.text)
+        print('Fedex Rates and transit times Service call in progress..')
+        talk('Please Wait...Fedex Rates and transit times call in progress..')
+        # responeData = requests.request("POST", fedexReqUrl, data=fedexData, headers=headers)
+        print("response.json()...................")
+        responseData = response.text
+        print(responseData)
+        print("-----*-----*-----*-----*-----*-----*")
+        # rate_code = json.loads(responseData)['output'][0]['alerts']['code']
+        # rate_msg = json.loads(responseData)['output'][0]['alerts']['message']
+        if response.status_code == 200:
+            tra_string12 = 'Rates and Transit times Successfully called...And the response which has been received from fedex is'
+            print(tra_string12)
+            print(responseData)
+            writeIntoFile(responseData, "rating")
+            tra_string112 = 'Thanks for using R1.0'
+            print(tra_string112)
+            talk(tra_string112)
+            print("-----*-----*-----*-----*-----*-----*")
+        elif response.status_code == 400:
+            tra_err = 'Sorry! not able to locate Please provide a valid reference/associated type'
+            print(tra_err)
+            talk(tra_err)
+            print("-----*-----*-----*-----*-----*-----*")
+        elif response.status_code == 401:
+            tra_err = 'Access token expired. Please modify your request and try again.'
+            print(tra_err)
+            talk(tra_err)
+        elif response.status_code == 403:
+            tra_err = 'We could not authorize your credentials. Please check your permissions and try again'
+            print(tra_err)
+            talk(tra_err)
+        elif response.status_code == 404:
+            tra_err = 'The resource you requested is no longer available. Please modify your request and try again'
+            print(tra_err)
+            talk(tra_err)
+        elif response.status_code == 500:
+            tra_err = 'We encountered an unexpected error and are working to resolve the issue. We apologize for any inconvenience. Please check back at a later time'
+            print(tra_err)
+            talk(tra_err)
+        elif response.status_code == 503:
+            tra_err = 'The service is currently unavailable and we are working to resolve the issue. We apologize for any inconvenience. Please check back at a later time.'
+            print(tra_err)
+            talk(tra_err)
+        else:
+            tra_string13 = 'Thanks for using R1.0'
+            print(tra_string13)
+            talk(tra_string13)
+        # stopspeacking()
+
+    elif there_exists(["fedex shipment", "create shipment", "shipping", "shipment"]):
+        print("I Am glad to help you on this, can you please provide me account number to get the status")
+        talk("I Am glad to help you on this can you please provide me your account number to create shipment")
+        print("740561073")
+        account_number = listen_trac_command()
+        audio_tra7 = "I am confirming the details: the given account number is"
+        print(audio_tra7)
+        talk(audio_tra7)
+        talk(account_number)
+        print(account_number)
+        account_number = re.sub(r'(\d)\s+(\d)', r'\1\2', account_number)
+        print(account_number)
+        print("-----*-----*-----*-----*-----*-----*")
+
+        # if 'yes' in isconfirm or 's' in isconfirm or 'z' in isconfirm or 'zee' in isconfirm or 'ss' in isconfirm or 'sí' in isconfirm or 'Oui' in isconfirm:
+        accessToken = getAuth()
+
+        url = shipURL
+
+        input1 = {
+            "labelResponseOptions": "URL_ONLY",
+            "requestedShipment": {
+                "shipper": {
+                    "contact": {
+                        "personName": "SHIPPER NAME",
+                        "phoneNumber": 1234567890,
+                        "companyName": "Shipper Company Name"
+                    },
+                    "address": {
+                        "streetLines": [
+                            "SHIPPER STREET LINE 1"
+                        ],
+                        "city": "Memphis",
+                        "stateOrProvinceCode": "TN",
+                        "postalCode": 38116,
+                        "countryCode": "US"
+                    }
+                },
+                "recipients": [
+                    {
+                        "contact": {
+                            "personName": "RECIPIENT NAME",
+                            "phoneNumber": 1234567890,
+                            "companyName": "Recipient Company Name"
+                        },
+                        "address": {
+                            "streetLines": [
+                                "RECIPIENT STREET LINE 1",
+                                "RECIPIENT STREET LINE 2"
+                            ],
+                            "city": "RICHMOND",
+                            "stateOrProvinceCode": "BC",
+                            "postalCode": "V7C4V7",
+                            "countryCode": "CA"
+                        }
+                    }
+                ],
+                "shipDatestamp": "2020-07-03",
+                "serviceType": "INTERNATIONAL_PRIORITY",
+                "packagingType": "YOUR_PACKAGING",
+                "pickupType": "USE_SCHEDULED_PICKUP",
+                "blockInsightVisibility": False,
+                "shippingChargesPayment": {
+                    "paymentType": "SENDER"
+                },
+                "shipmentSpecialServices": {
+                    "specialServiceTypes": [
+                        "RETURN_SHIPMENT"
+                    ],
+                    "returnShipmentDetail": {
+                        "returnType": "PRINT_RETURN_LABEL"
+                    }
+                },
+                "labelSpecification": {
+                    "imageType": "PDF",
+                    "labelStockType": "PAPER_85X11_TOP_HALF_LABEL"
+                },
+                "customsClearanceDetail": {
+                    "isDocumentOnly": False,
+                    "dutiesPayment": {
+                        "paymentType": "SENDER"
+                    },
+                    "commodities": [
+                        {
+                            "description": "Commodity description",
+                            "countryOfManufacture": "US",
+                            "weight": {
+                                "value": 10,
+                                "units": "LB"
+                            },
+                            "quantity": 1,
+                            "quantityUnits": "PCS",
+                            "unitPrice": {
+                                "amount": 100,
+                                "currency": "USD"
+                            },
+                            "customsValue": {
+                                "amount": 100,
+                                "currency": "USD"
+                            }
+                        }
+                    ],
+                    "customsOption": {
+                        "type": "EXHIBITION_TRADE_SHOW"
+                    }
+                },
+                "requestedPackageLineItems": [
+                    {
+                        "weight": {
+                            "units": "LB",
+                            "value": 10
+                        },
+                        "customerReferences": [
+                            {
+                                "customerReferenceType": "RMA_ASSOCIATION",
+                                "value": "RMA for Returns"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "accountNumber": {
+                "value": account_number
+            }
+        }
+        headers = getfedExHeaders(accessToken)
+        print(headers)
+        payload = json.dumps(input1)  # 'input' refers to JSON Payload
+        print('after json_dumps')
+        print(payload)
+        print("-----*-----*-----*-----*-----*-----*")
+        response = requests.request("POST", url, data=payload, headers=headers)
+        print(response.text)
+        print('Please Wait...Fedex creating shipment call in progress..')
+        talk('Please Wait...Fedex creating shipment call in progress..')
+        # responeData = requests.request("POST", fedexReqUrl, data=fedexData, headers=headers)
+        print("response.json()...................")
+        responseData = response.text
+        print(responseData)
+        print("-----*-----*-----*-----*-----*-----*")
+        if response.status_code == 200:
+            tra_string12 = 'Successfully Shipment Created.And the response which has been received from fedex is'
+            print(tra_string12)
+            print(responseData)
+            writeIntoFile(responseData, 'shipment')
+            tra_string112 = 'Thanks for using R1.0'
+            print(tra_string112)
+            talk(tra_string112)
+            print("-----*-----*-----*-----*-----*-----*")
+        elif response.status_code == 400:
+            tra_err = 'Sorry! not able to locate Please provide a valid reference/associated type'
+            print(tra_err)
+            talk(tra_err)
+            print("-----*-----*-----*-----*-----*-----*")
+        elif response.status_code == 401:
+            tra_err = 'Access token expired. Please modify your request and try again.'
+            print(tra_err)
+            talk(tra_err)
+        elif response.status_code == 403:
+            tra_err = 'We could not authorize your credentials. Please check your permissions and try again'
+            print(tra_err)
+            talk(tra_err)
+        elif response.status_code == 404:
+            tra_err = 'The resource you requested is no longer available. Please modify your request and try again'
+            print(tra_err)
+            talk(tra_err)
+        elif response.status_code == 500:
+            tra_err = 'We encountered an unexpected error and are working to resolve the issue. We apologize for any inconvenience. Please check back at a later time'
+            print(tra_err)
+            talk(tra_err)
+        elif response.status_code == 503:
+            tra_err = 'The service is currently unavailable and we are working to resolve the issue. We apologize for any inconvenience. Please check back at a later time.'
+            print(tra_err)
+            talk(tra_err)
+        else:
+            tra_string13 = 'Thanks for using R1.0'
+            print(tra_string13)
+            talk(tra_string13)
+        # stopspeacking()
+
+    elif there_exists(["fedex tracking", "delivery", "where is package", "Shipment details"]):
+        print("I Am glad to help you on this, can you please provide me tracking number to get the status")
+        talk("I Am glad to help you on this, can you please provide me tracking number to get the status")
+        print("sample tracking 123456789012/ 858488600850")
+        print("122816215025810 = Delivered")
+        print("020207021381215 = Picked Up")
+        print("403934084723025 = Arrived at FedEx location")
+        print("920241085725456 = At local FedEx facility")
+        print("-----*-----*-----*-----*-----*-----*")
+        tracking_number = listen_trac_command()
+        audio_tra7 = "I am confirming the details: the given tracking number is"
+        print(audio_tra7)
+        talk(audio_tra7)
+        talk(tracking_number)
+        print(tracking_number)
+        tracking_number = re.sub(r'(\d)\s+(\d)', r'\1\2', tracking_number)
+        print(tracking_number)
+        print("-----*-----*-----*-----*-----*-----*")
+        tra_string11 = "All these details are okay? Shall i proceed to create? please confirm yes or no"
+        print(tra_string11)
+        talk(tra_string11)
+        isconfirm = listen_trac_command()
+        print(isconfirm)
+        if 'yes' in isconfirm or 's' in isconfirm or 'z' in isconfirm or 'zee' in isconfirm or 'ss' in isconfirm or 'sí' in isconfirm or 'Oui' in isconfirm:
+            accessToken = getAuth()
+
+            url = trackingURL
+
+            input1 = {
+                "includeDetailedScans": 1,
+                "associatedType": "STANDARD_MPS",
+                "masterTrackingNumberInfo": {
+                    "shipDateEnd": "2022-04-10",
+                    "shipDateBegin": "2022-04-01",
+                    "trackingNumberInfo": {
+                        "trackingNumberUniqueId": "245822~" + tracking_number + "~FDEG",
+                        "carrierCode": "FDXE",
+                        "trackingNumber": tracking_number
+                    }
+                },
+                "pagingDetails": {
+                    "resultsPerPage": 56,
+                    "pagingToken": "38903279038"
+                }
+            }
+
+            headers = getfedExHeaders(accessToken)
+            print(headers)
+            payload = json.dumps(input1)  # 'input' refers to JSON Payload
+            print('after json_dumps')
+            print(payload)
+            response = requests.request("POST", url, data=payload, headers=headers)
+            print(response.text)
+            print('Fedex Service call in progress..')
+            talk('Please Wait...Fedex Service call in progress..')
+            # responeData = requests.request("POST", fedexReqUrl, data=fedexData, headers=headers)
+            print("response.json()...................")
+            responseData = response.text
+            print(responseData)
+            print(json.loads(responseData))
+            print("-----*-----*-----*-----*-----*-----*")
+            # print(json.loads(json.dumps(responseData)))
+            print(json.loads(responseData)['output'])
+            print("-----*-----*-----*-----*-----*-----*")
+            print(json.loads(responseData)['output']['completeTrackResults'])
+            print("-----*-----*-----*-----*-----*-----*")
+            outputres = json.loads(responseData)['output']['completeTrackResults'][0]['trackResults']
+            print(outputres)
+            print("-----*-----*-----*-----*-----*-----*")
+            # tracking_code = json.loads(responseData)['output']['completeTrackResults'][0]['trackResults'][0]['error']['code']
+            tracking_msg = json.loads(responseData)['output']['completeTrackResults'][0]['trackResults'][0]['error'][
+                'message']
+            if response.status_code == 200:
+                tra_string12 = 'Successfully located.And the message has been received from fedex is'
+                print(tra_string12)
+                talk(tra_string12)
+                print(tracking_msg)
+                talk(tracking_msg)
+                writeIntoFile(responseData, 'tracking')
+                tra_string112 = 'Thanks for using R1.0'
+                print(tra_string112)
+                talk(tra_string112)
+                print("-----*-----*-----*-----*-----*-----*")
+            elif response.status_code == 400:
+                tra_err = 'Sorry! not able to locate Please provide a valid reference/associated type'
+                print(tra_err)
+                talk(tra_err)
+                print("-----*-----*-----*-----*-----*-----*")
+            elif response.status_code == 401:
+                tra_err = 'Access token expired. Please modify your request and try again.'
+                print(tra_err)
+                talk(tra_err)
+            elif response.status_code == 403:
+                tra_err = 'We could not authorize your credentials. Please check your permissions and try again'
+                print(tra_err)
+                talk(tra_err)
+            elif response.status_code == 404:
+                tra_err = 'The resource you requested is no longer available. Please modify your request and try again'
+                print(tra_err)
+                talk(tra_err)
+            elif response.status_code == 500:
+                tra_err = 'We encountered an unexpected error and are working to resolve the issue. We apologize for any inconvenience. Please check back at a later time'
+                print(tra_err)
+                talk(tra_err)
+            elif response.status_code == 503:
+                tra_err = 'The service is currently unavailable and we are working to resolve the issue. We apologize for any inconvenience. Please check back at a later time.'
+                print(tra_err)
+                talk(tra_err)
+            else:
+                tra_string13 = 'Thanks for using R1.0'
+                print(tra_string13)
+                talk(tra_string13)
+            # stopspeacking()
+        else:
+            talk("Pardon! can you please come again the same")
+            listen_trac_command()
+            # stopspeacking()
+        run_alexa(choosenLangCode)
+
     else:
-        # talk('Please repeat again.')
-        return 0
-
-
-    def callback(r, c):
-        global player
-
-        if player == 'X' and states[r][c] == 0 and stop_game == False:
-            b[r][c].configure(text='X', fg='blue', bg='white')
-            states[r][c] = 'X'
-            player = 'O'
-
-        if player == 'O' and states[r][c] == 0 and stop_game == False:
-            b[r][c].configure(text='O', fg='red', bg='yellow')
-            states[r][c] = 'O'
-            player = 'X'
-        check_for_winner()
-
-
-    def check_for_winner():
-        global stop_game
-        global root
-        for i in range(3):
-            if states[i][0] == states[i][1] == states[i][2] != 0:
-                b[i][0].config(bg='grey')
-                b[i][1].config(bg='grey')
-                b[i][2].config(bg='grey')
-
-                stop_game = True
-
-                root.destroy()
-
-        for i in range(3):
-            if states[0][i] == states[1][i] == states[2][i] != 0:
-                b[0][i].config(bg='grey')
-                b[1][i].config(bg='grey')
-                b[2][i].config(bg='grey')
-
-                stop_game = True
-
-                root.destroy()
-
-            if states[0][0] == states[1][1] == states[2][2] != 0:
-                b[0][0].config(bg='grey')
-                b[1][1].config(bg='grey')
-                b[2][2].config(bg='grey')
-
-                stop_game = True
-
-                root.destroy()
-
-            if states[2][0] == states[1][1] == states[0][2] != 0:
-                b[2][0].config(bg='grey')
-                b[1][1].config(bg='grey')
-                b[0][2].config(bg='grey')
-
-                stop_game = True
-
-                root.destroy()
+        talk("Pardon! can you please come again the same")
+        listen_trac_command()
+        # stopspeacking()
+    run_alexa(choosenLangCode)
 
 
 def select_review():
@@ -1560,38 +1929,39 @@ def select_review():
 
     root3.mainloop()
 
+
 def select1():
     global vs
     global root3
     global type_of_review
 
     if vs.get() == 1:
-        message.showinfo(" ","Thank you for your review!!")
+        message.showinfo(" ", "Thank you for your review!!")
         review = "Very Satisfied"
         type_of_review = "Positive"
         root3.destroy()
     elif vs.get() == 2:
-        message.showinfo(" ","Thank you for your review!!")
+        message.showinfo(" ", "Thank you for your review!!")
         review = "Satisfied"
         type_of_review = "Positive"
         root3.destroy()
     elif vs.get() == 3:
-        message.showinfo(" ","Thank you for your review!!!!")
+        message.showinfo(" ", "Thank you for your review!!!!")
         review = "Neither Satisfied Nor Dissatisfied"
         type_of_review = "Neutral"
         root3.destroy()
     elif vs.get() == 4:
-        message.showinfo(" ","Thank you for your review!!")
+        message.showinfo(" ", "Thank you for your review!!")
         review = "Dissatisfied"
         type_of_review = "Negative"
         root3.destroy()
     elif vs.get() == 5:
-        message.showinfo(" ","Thank you for your review!!")
+        message.showinfo(" ", "Thank you for your review!!")
         review = "Very Dissatisfied"
         type_of_review = "Negative"
         root3.destroy()
     elif vs.get() == 6:
-        message.showinfo(" ","    Ok    ")
+        message.showinfo(" ", "    Ok    ")
         review = "I do not want to give review"
         type_of_review = "No review"
         root3.destroy()
@@ -1602,11 +1972,6 @@ def select1():
         sys.exit()
     except Exception as e:
         pass
-
-def there_exists(terms):
-    for term in terms:
-        if term in command:
-            return True
 
 
 def convert_language(audio_string, language_code):
@@ -1647,7 +2012,6 @@ def convert_language(audio_string, language_code):
 
 
 def startspeakeithme():
-    # detect_face()
     wishMe()
     choosenLangcode = choose_language()
     choosenLangcode = choosenLangcode.lower()
@@ -1662,57 +2026,215 @@ def startspeakeithme():
         run_alexa(choosenLangcode)
 
 
+def getAuth():
+    print('Fedex track api loading ...')
+    # fedex authorization
+    authurl = "https://apis-sandbox.fedex.com/oauth/token"
+    payload = "grant_type=client_credentials&client_id=l7c83fd3c68c8049df93b5d72b8274641d&client_secret=2e09a50ac5fc428a9d24a891f919b1a5"
+    headers = {
+        'Content-Type': "application/x-www-form-urlencoded"
+    }
+    authresponse = requests.request("POST", authurl, data=payload, headers=headers)
+
+    # print(authresponse.text)
+    print(json.loads(authresponse.text).get('access_token'))
+    print(json.loads(authresponse.text)['access_token'])
+    accessToken = json.loads(authresponse.text)['access_token']
+
+    return accessToken
+    # print(accessToken)
+    # time.sleep(5)
+
+
+def getfedExHeaders(accessToken):
+    headers = {
+        'Content-Type': "application/json",
+        'X-locale': "en_US",
+        'Authorization': "Bearer " + accessToken
+    }
+    return headers
+
+
+def trueFun():
+    return True
+
+
+def falseFun():
+    return False
+
+
+def writeIntoFile(responseData, filename):
+    print("I am going to write this response in the text file")
+    talk("I am going to write this response in the text file")
+    suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
+    filename1 = "_".join([filename, suffix])
+    file = open(filename1 + '.txt', 'w')
+    print('writing into file')
+    file.write(responseData)
+    talk("Response data is saved in " + filename1 + '.txt' + "file.")
+
+
 def stopspeacking():
+    talk('Please give the review before log off. It will help me to improve my performance.')
+    select_review()
     talk("Ok , your pc will log off in 10 sec make sure you exit from all applications")
     sys.exit()
 
 
-def alarm():
-    root = Tk()
-    hrs = StringVar()
-    mins = StringVar()
-    secs = StringVar()
-    root.title('R1.0 Alarm-Clock')
-    speak('Please enter the time in the format hour, minutes and seconds. When the alarm should rang?')
-    speak('Please enter the time greater than the current time')
+def alarm(self, root):
+    self.window = root
+    self.window.geometry("680x420+0+0")
+    self.window.title("R1.0 Clock")
 
-    def setalarm():
-        alarmtime = f"{hrs.get()}:{mins.get()}:{secs.get()}"
-        print(alarmtime)
-        if alarmtime != "::":
-            alarmclock(alarmtime)
-        else:
-            speak('You have not entered the time.')
+    # Background image of the first window.
+    self.bg_image = ImageTk.PhotoImage(file="Images/image_1.jpg")
+    self.background = tknew.Label(self.window, image=self.bg_image)
+    self.background.place(x=0, y=0, relwidth=1, relheight=1)
 
-    def alarmclock(alarmtime):
-        print("am in alaramclock fun")
-        time_now = datetime.datetime.now().strftime("%H:%M:%S")
-        print(time_now)
+    # Display Label that shows the current time in the
+    # first window
+    self.display = tknew.Label(self.window, font=('Helvetica', 34),
+                               bg='gray8', fg='yellow')
+    self.display.place(x=100, y=150)
+
+    # Calling the the function.
+    self.show_time()
+
+    # Placing the set alarm button.
+    # Font Type: relief solid font helevetica.
+    set_button = tknew.Button(self.window, text="Set Alarm",
+                              font=('Helvetica', 15), bg="green", fg="white",
+                              command=self.another_window)
+    set_button.place(x=270, y=220)
+
+
+# This function shows the current time in the first window.
+def show_time(self):
+    current_time = time.strftime('%H:%M:%S %p, %A')
+    # Placing the time format level.
+    self.display.config(text=current_time)
+    self.display.after(100, self.show_time)
+
+
+# Another Window: This window will show, when the "Set Alarm"
+# Button will pressed.
+def another_window(self):
+    self.window_2 = tknew.Tk()
+    self.window_2.title("Set Alarm")
+    self.window_2.geometry("680x420+200+200")
+
+    # Hour Label.
+    hours_label = tknew.Label(self.window_2, text="Hours",
+                              font=("times new roman", 20))
+    hours_label.place(x=150, y=50)
+
+    #  Minute Label.
+    minute_label = tknew.Label(self.window_2, text="Minutes",
+                               font=("times new roman", 20))
+    minute_label.place(x=450, y=50)
+
+    # Hour Combobox.
+    self.hours = tknew.StringVar()
+    self.hours_combobox = ttk.Combobox(self.window_2,
+                                       width=10, height=10, textvariable=self.hours,
+                                       font=("times new roman", 15))
+    self.hours_combobox['values'] = hours_list
+    self.hours_combobox.current(0)
+    self.hours_combobox.place(x=150, y=90)
+
+    # Minute Combobox.
+    self.minutes = tknew.StringVar()
+    self.minutes_combobox = ttk.Combobox(self.window_2,
+                                         width=10, height=10, textvariable=self.minutes,
+                                         font=("times new roman", 15))
+    self.minutes_combobox['values'] = minutes_list
+    self.minutes_combobox.current(0)
+    self.minutes_combobox.place(x=450, y=90)
+
+    # Ringtone Label.
+    ringtone_label = tknew.Label(self.window_2, text="Ringtones",
+                                 font=("times new roman", 20))
+    ringtone_label.place(x=150, y=130)
+
+    # Ringtone Combobox(Choose the ringtone).
+    self.ringtones = tknew.StringVar()
+    self.ringtones_combobox = ttk.Combobox(self.window_2,
+                                           width=15, height=10, textvariable=self.ringtones,
+                                           font=("times new roman", 15))
+    self.ringtones_combobox['values'] = ringtones_list
+    self.ringtones_combobox.current(0)
+    self.ringtones_combobox.place(x=150, y=170)
+
+    # Title or Message Label.
+    message_label = tknew.Label(self.window_2, text="Message",
+                                font=("times new roman", 20))
+    message_label.place(x=150, y=210)
+
+    # Message Entrybox: This Message will show, when
+    # the alarm will ringing.
+    self.message = tknew.StringVar()
+    self.message_entry = tknew.Entry(self.window_2,
+                                     textvariable=self.message, font=("times new roman", 14), width=30)
+    self.message_entry.insert(0, 'Wake Up')
+    self.message_entry.place(x=150, y=250)
+
+    # Test Button: For testing the ringtone music.
+    test_button = tknew.Button(self.window_2, text='Test',
+                               font=('Helvetica', 15), bg="white", fg="black", command=self.test_window)
+    test_button.place(x=150, y=300)
+
+    # The Cancel Button: For cancel the alarm.
+    cancel_button = tknew.Button(self.window_2,
+                                 text='Cancel', font=('Helvetica', 15), bg="white",
+                                 fg="black", command=self.window_2.destroy)
+    cancel_button.place(x=390, y=300)
+
+    # The Start Button: For set the alarm time
+    start_button = tknew.Button(self.window_2, text='Start',
+                                font=('Helvetica', 15), bg="green", fg="white", command=self.Threading_1)
+    start_button.place(x=490, y=300)
+
+    self.window_2.mainloop()
+
+
+# In this function, I have used python multiprocessing module
+# to play the ringtones while the alarm gets notified.
+def test_window(self):
+    process = multiprocessing.Process(target=playsound,
+                                      args=(ringtones_path[self.ringtones_combobox.get()],))
+    process.start()
+    messagebox.showinfo('Playing...', 'press ENTER to stop playing')
+    process.terminate()
+
+
+# Creating a thread
+def Threading_1(self):
+    x = Thread(target=self.set_alarm_time)
+    x.start()
+
+
+# This function gets called when the start button pressed
+# in the another window for setting alarm time.
+def set_alarm_time(self):
+    alarm_time = f"{self.hours_combobox.get()}:{self.minutes_combobox.get()}"
+    messagebox.showinfo("Alarm Set", f"Alarm set for {alarm_time}")
+    try:
         while True:
-            time.sleep(1)
-            time_now = datetime.datetime.now().strftime("%H:%M:%S")
-            print(time_now)
-            if time_now == alarmtime:
-                Wakeup = Label(root, font=('arial', 20, 'bold'), text="Wake up! Wake up! Wake up", bg="DodgerBlue2",
-                               fg="white").grid(row=6, columnspan=3)
-                talk("Wake up, Have a good day")
-                print("Wake up!")
-                mixer.init()
-                mixer.music.load(r'Music/Runaway-Aurora.mp3')
-                mixer.music.play()
+            # The current time is in 24 hour format
+            current_time = datetime.now()
+            # Converting the current time into hour and minute
+            current_time_format = current_time.strftime("%H:%M")
+            if current_time_format == alarm_time:
+                process = multiprocessing.Process(target=playsound,
+                                                  args=(ringtones_path[self.ringtones_combobox.get()],))
+                process.start()
+                # Messagebox: This messagebox will show, when the
+                # alarm will ringing.
+                messagebox.showinfo("Alarm", f"{self.message_entry.get()}, It's {alarm_time}")
+                process.terminate()
                 break
-        talk('you can click on close icon to close the alarm window.')
-
-    greet = Label(root, font=('arial', 20, 'bold'), text="Take a short nap!").grid(row=1, columnspan=3)
-    hrbtn = Entry(root, textvariable=hrs, width=5, font=('arial', 20, 'bold'))
-    hrbtn.grid(row=2, column=1)
-    minbtn = Entry(root, textvariable=mins, width=5, font=('arial', 20, 'bold')).grid(row=2, column=2)
-    secbtn = Entry(root, textvariable=secs, width=5, font=('arial', 20, 'bold')).grid(row=2, column=3)
-    setbtn = Button(root, text="set alarm", command=setalarm, bg="DodgerBlue2", fg="white",
-                    font=('arial', 20, 'bold')).grid(row=4, columnspan=3)
-    timeleft = Label(root, font=('arial', 20, 'bold'))
-    timeleft.grid()
-    mainloop()
+    except Exception as es:
+        messagebox.showerror("Error!", f"Error due to {es}")
 
 
 #   subprocess.call(["sleep", "/l"])
@@ -1787,9 +2309,28 @@ if __name__ == '__main__':
         width=145.0,
         height=50.0
     )
+
+    """
+    button_image_4 = PhotoImage(
+        file=getCorrectPath("assets/alaramimg.png"))
+    button_4 = tk.Button(
+        image=button_image_4,
+        borderwidth=0,
+        highlightthickness=0,
+        command=Alarmclock(canvas,obj),
+        relief="flat", cursor="hand1"
+    )
+    button_4.place(
+        x=0,
+        y=0,
+        width=125.0,
+        height=125.0
+    )
+    """
     img = tk.Image("photo", file=getCorrectPath("assets/inc.png"))
     obj.tk.call('wm', 'iconphoto', obj._w, img)
     # obj.config(menu="")
+    # Alarmclock(obj)
     obj.mainloop()
 
 # wishMe()
