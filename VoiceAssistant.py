@@ -22,10 +22,9 @@ from PIL import ImageTk
 from googletrans import Translator
 import pyttsx3
 # from pyjsparser.parser import true, false
-
+from alarmclock import Alarmclock
 from weather import *
 # import messagebox from tkinter module
-# from alarmclock import *
 import tkinter as tknew
 import time
 from PIL import ImageTk
@@ -419,7 +418,7 @@ def brightness():
             pyautogui.click()
             pyautogui.moveTo(1880, 1050)
             pyautogui.click()
-            speak('If you again want to change brihtness, say, change brightness')
+            speak('If you again want to change brightness, say, change brightness')
         elif '50' in query:
             pyautogui.moveTo(1880, 1050)
             pyautogui.click()
@@ -428,7 +427,7 @@ def brightness():
             pyautogui.click()
             pyautogui.moveTo(1880, 1050)
             pyautogui.click()
-            speak('If you again want to change brihtness, say, change brightness')
+            speak('If you again want to change brightness, say, change brightness')
         elif '75' in query:
             pyautogui.moveTo(1880, 1050)
             pyautogui.click()
@@ -437,7 +436,7 @@ def brightness():
             pyautogui.click()
             pyautogui.moveTo(1880, 1050)
             pyautogui.click()
-            speak('If you again want to change brihtness, say, change brightness')
+            speak('If you again want to change brightness, say, change brightness')
         elif '100' in query or 'full' in query:
             pyautogui.moveTo(1880, 1050)
             pyautogui.click()
@@ -446,7 +445,7 @@ def brightness():
             pyautogui.click()
             pyautogui.moveTo(1880, 1050)
             pyautogui.click()
-            speak('If you again want to change brihtness, say, change brightness')
+            speak('If you again want to change brightness, say, change brightness')
         else:
             speak('Please select 25, 50, 75 or 100....... Say again.')
             brightness()
@@ -471,7 +470,7 @@ def close_window():
 def run_alexa(choosenLangCode):
     global command
     command = listen_command(choosenLangCode)
-    print('printing user said value')
+    print('user said:')
     print(command)
 
     if is_weather_search_action(command):
@@ -1302,9 +1301,8 @@ def run_alexa(choosenLangCode):
 
 
     elif there_exists(["fedex rates", "rates", "Rate and Transit times", "Transit times"]):
-        print("I Am glad to help you on this, can you please provide me tracking number to get the status")
-        talk(
-            "I Am glad to help you on providing rate and transit times, can you please provide me your account number to get the status")
+        print("I'm glad to be of service, can you please provide me tracking number")
+        talk("I'm glad to be of service on providing rate and transit times, can you please provide me your account number")
         print("740561073")
         account_number = listen_trac_command()
         audio_tra7 = "I am confirming the details: the given account number is"
@@ -1546,7 +1544,7 @@ def run_alexa(choosenLangCode):
         response = requests.request("POST", url, data=payload, headers=headers)
         print(response.text)
         print('Fedex Rates and transit times Service call in progress..')
-        talk('Please Wait...Fedex Rates and transit times call in progress..')
+        talk('Please Wait...Fedex Rates and transit times call is in progress..')
         # responeData = requests.request("POST", fedexReqUrl, data=fedexData, headers=headers)
         print("response.json()...................")
         responseData = response.text
@@ -1595,11 +1593,11 @@ def run_alexa(choosenLangCode):
         # stopspeacking()
 
     elif there_exists(["fedex shipment", "create shipment", "shipping", "shipment"]):
-        print("I Am glad to help you on this, can you please provide me account number to get the status")
-        talk("I Am glad to help you on this can you please provide me your account number to create shipment")
+        print("Hey uma I am here for you whenever you need us, to complete this request can you please provide me account number to get the status")
+        talk("Hey uma I am here for you whenever you need us, to complete this request  can you please provide me your account number to create shipment")
         print("740561073")
         account_number = listen_trac_command()
-        audio_tra7 = "I am confirming the details: the given account number is"
+        audio_tra7 = "i just want to confirm the given account number is"
         print(audio_tra7)
         talk(audio_tra7)
         talk(account_number)
@@ -1774,9 +1772,9 @@ def run_alexa(choosenLangCode):
             talk(tra_string13)
         # stopspeacking()
 
-    elif there_exists(["fedex tracking", "delivery", "where is package", "Shipment details"]):
-        print("I Am glad to help you on this, can you please provide me tracking number to get the status")
-        talk("I Am glad to help you on this, can you please provide me tracking number to get the status")
+    elif there_exists(["fedex tracking","track", "delivery", "where is package", "Shipment details"]):
+        print("Hey It's my pleasure, can you please provide me tracking number to get the status")
+        talk("It's my pleasure, can you please provide me tracking number to get the status")
         print("sample tracking 123456789012/ 858488600850")
         print("122816215025810 = Delivered")
         print("020207021381215 = Picked Up")
@@ -2245,8 +2243,8 @@ if __name__ == '__main__':
     canvas = Canvas(
         obj,
         bg="#E7EBEE",
-        height=500,
-        width=800,
+        height=600,
+        width=900,
         bd=0,
         highlightthickness=0,
         relief="ridge"
@@ -2273,9 +2271,90 @@ if __name__ == '__main__':
     )
     button_1.place(
         x=329.0,
-        y=122.0,
-        width=132.0,
-        height=128.0
+        y=30.0,
+        width=138.0,
+        height=153.0
+    )
+
+    button_image_10 = PhotoImage(
+        file=getCorrectPath("assets/ticket.png"))
+    button_10 = tk.Button(
+        image=button_image_10,
+        borderwidth=0,
+        highlightthickness=0,
+        command=startspeakeithme,
+        relief="flat", cursor="hand1"
+    )
+    button_10.place(
+        x=30.0,
+        y=130.0,
+        width=78.0,
+        height=78.0
+    )
+
+    button_image_7 = PhotoImage(
+        file=getCorrectPath("assets/tracking.png"))
+    button_7 = tk.Button(
+        image=button_image_7,
+        borderwidth=0,
+        highlightthickness=0,
+        command=lambda: print("button_7 clicked"),
+        relief="flat", cursor="hand1"
+    )
+    button_7.place(
+        x=30.0,
+        y=220.0,
+        width=64.0,
+        height=64.0
+    )
+
+    button_image_8 = PhotoImage(
+        file=getCorrectPath("assets/ship1.png"))
+    button_8 = tk.Button(
+        image=button_image_8,
+        borderwidth=0,
+        highlightthickness=0,
+        command=lambda: print("button_8 clicked"),
+        relief="flat", cursor="hand1"
+    )
+    button_8.place(
+        x=30.0,
+        y=300.0,
+        width=64.0,
+        height=64.0
+    )
+
+    button_image_9 = PhotoImage(
+        file=getCorrectPath("assets/rates.png"))
+    button_9 = tk.Button(
+        image=button_image_9,
+        borderwidth=0,
+        highlightthickness=0,
+        command=lambda: print("button_9 clicked"),
+        relief="flat", cursor="hand1"
+    )
+    button_9.place(
+        x=30.0,
+        y=380.0,
+        width=64.0,
+        height=64.0
+    )
+
+
+    button_image_6 = PhotoImage(
+        file=getCorrectPath("assets/a1.png"))
+    button_6 = tk.Button(
+        image=button_image_6,
+        borderwidth=0,
+        highlightthickness=0,
+        command=Alarmclock(obj),
+        relief="flat", cursor="hand1"
+    )
+    button_6.place(
+        x=690.0,
+        y=70.0,
+        width=56.0,
+        height=56.0
     )
 
     button_image_2 = PhotoImage(
@@ -2294,6 +2373,7 @@ if __name__ == '__main__':
         height=103.0
     )
 
+
     button_image_3 = PhotoImage(
         file=getCorrectPath("assets/quit.png"))
     button_3 = tk.Button(
@@ -2304,29 +2384,32 @@ if __name__ == '__main__':
         relief="flat", cursor="hand1"
     )
     button_3.place(
-        x=334.0,
-        y=260.0,
-        width=145.0,
-        height=50.0
+        #x=334.0,
+        #y=260.0,
+        x=340.0,
+        y=380.0,
+        width=147.0,
+        height=60.0
     )
 
-    """
-    button_image_4 = PhotoImage(
-        file=getCorrectPath("assets/alaramimg.png"))
-    button_4 = tk.Button(
-        image=button_image_4,
+    button_image_5 = PhotoImage(
+        file=getCorrectPath("assets/vc3.png"))
+    button_5 = tk.Button(
+        image=button_image_5,
         borderwidth=0,
         highlightthickness=0,
-        command=Alarmclock(canvas,obj),
+        command=startspeakeithme,
         relief="flat", cursor="hand1"
     )
-    button_4.place(
-        x=0,
-        y=0,
-        width=125.0,
-        height=125.0
+    button_5.place(
+        #x=490.0,
+        #y=300.0,
+        x=254.0,
+        y=180.0,
+        width=300.0,
+        height=168.0
     )
-    """
+
     img = tk.Image("photo", file=getCorrectPath("assets/inc.png"))
     obj.tk.call('wm', 'iconphoto', obj._w, img)
     # obj.config(menu="")
