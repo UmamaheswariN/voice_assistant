@@ -3,6 +3,23 @@
 
 pyinstaller --onefile --icon="logo1.ico" --hidden-import pandas._libs.tslibs.base --hidden-import PIL._tkinter_finder --name="VOICEAIDE" -i "logo1.ico" aide.py
 
+**Libraries setup:-**
+1. Pycharm editor
+2. python speech Recognition - pip install SpeechRecognition
+3. pyttsx3 2.90 - pip install pyttsx3
+4.python audio - pip install PyAudio - if we get error any time , we need to install pipwin by using below cmd,
+
+pip install SpeechRecognition
+pip install pyttsx3
+pip install pipwin
+then pipwin install Pyaudio
+
+pip install pywhatkit - for utube
+pip install wikipedia
+pip install pyjokes
+pip install python-utils
+
+
 **Features in voice assistant:**
 
 **version 1**:
