@@ -1770,7 +1770,7 @@ def run_alexa(choosenLangCode):
             tra_string13 = 'Thanks for using R1.0'
             print(tra_string13)
             talk(tra_string13)
-        # stopspeacking()
+            # stopspeacking()
 
     elif there_exists(["fedex tracking","track", "delivery", "where is package", "Shipment details"]):
         print("Hey It's my pleasure, can you please provide me tracking number to get the status")

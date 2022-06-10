@@ -1,4 +1,4 @@
-from aide_MultiLang import *
+from VoiceAssistant import *
 
 class FrenchService(object):
     def __init__(self):

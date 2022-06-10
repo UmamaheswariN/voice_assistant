@@ -1,6 +1,6 @@
 import requests
 
-from aide_MultiLang import there_exists, translator, convert_language, talk, talk_command, stopspeacking
+from VoiceAssistant import there_exists, translator, convert_language, talk, talk_command, stopspeacking
 
 
 class SpanishService(object):

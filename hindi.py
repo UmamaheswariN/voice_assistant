@@ -1,4 +1,4 @@
-from aide_MultiLang import *
+from VoiceAssistant import *
 
 class HindiService(object):
     def __init__(self):

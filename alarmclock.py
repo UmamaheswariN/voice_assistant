@@ -7,8 +7,6 @@ import multiprocessing
 from datetime import datetime
 from threading import *
 
-
-
 # Hours List.
 hours_list = ['00', '01', '02', '03', '04', '05', '06', '07',
               '08', '09', '10', '11', '12', '13', '14', '15',
@@ -25,7 +23,7 @@ minutes_list = ['00', '01', '02', '03', '04', '05', '06', '07',
                 '56', '57', '58', '59']
 
 # Ringtones list.
-ringtones_list = ['Best_wake_up','Cuckoo_Clock','Runaway_Aurora', 'nice_wake_up', 'romantic',
+ringtones_list = ['Best_wake_up', 'Cuckoo_Clock', 'Runaway_Aurora', 'nice_wake_up', 'romantic',
                   'twirling_intime', 'wakeup_alarm_tone']
 
 # Ringtone Paths.
@@ -47,14 +45,14 @@ class Alarmclock:
         self.window.geometry("800x500+0+0")
 
         # Background image of the first window.
-        #self.bg_image = ImageTk.PhotoImage(file="Images/image_1.jpg")
-        #self.background = tknew.Label(self.window, image=self.bg_image)
-        #self.background.place(x=0, y=0, relwidth=1, relheight=1)
+        # self.bg_image = ImageTk.PhotoImage(file="Images/image_1.jpg")
+        # self.background = tknew.Label(self.window, image=self.bg_image)
+        # self.background.place(x=0, y=0, relwidth=1, relheight=1)
 
         # Display Label that shows the current time in the
         # first window
         self.display = tknew.Label(self.window, font=('Helvetica', 15),
-                             bg='#7e0407', fg='yellow')
+                                   bg='#7e0407', fg='yellow')
         self.display.place(x=600, y=30)
 
         # Calling the the function.
@@ -63,8 +61,8 @@ class Alarmclock:
         # Placing the set alarm button.
         # Font Type: relief solid font helevetica.
         set_button = tknew.Button(self.window, text="Set Alarm",
-                            font=('Helvetica', 15), bg="#3246a8", fg="white",
-                            command=self.another_window)
+                                  font=('Helvetica', 15), bg="#3246a8", fg="white",
+                                  command=self.another_window)
         set_button.place(x=670, y=150)
 
     # This function shows the current time in the first window.
@@ -83,13 +81,13 @@ class Alarmclock:
         self.window_2.configure(background="blue")
 
         # Hour Label.
-        hours_label =tknew.Label(self.window_2, text="Hours",
-                            font=("times new roman", 20))
+        hours_label = tknew.Label(self.window_2, text="Hours",
+                                  font=("times new roman", 20))
         hours_label.place(x=150, y=50)
 
         #  Minute Label.
         minute_label = tknew.Label(self.window_2, text="Minutes",
-                             font=("times new roman", 20))
+                                   font=("times new roman", 20))
         minute_label.place(x=450, y=50)
 
         # Hour Combobox.
@@ -112,7 +110,7 @@ class Alarmclock:
 
         # Ringtone Label.
         ringtone_label = tknew.Label(self.window_2, text="Ringtones",
-                               font=("times new roman", 20))
+                                     font=("times new roman", 20))
         ringtone_label.place(x=150, y=130)
 
         # Ringtone Combobox(Choose the ringtone).
@@ -126,31 +124,31 @@ class Alarmclock:
 
         # Title or Message Label.
         message_label = tknew.Label(self.window_2, text="Message",
-                              font=("times new roman", 20))
+                                    font=("times new roman", 20))
         message_label.place(x=150, y=210)
 
         # Message Entrybox: This Message will show, when
         # the alarm will ringing.
         self.message = tknew.StringVar()
         self.message_entry = tknew.Entry(self.window_2,
-                                   textvariable=self.message, font=("times new roman", 14), width=30)
+                                         textvariable=self.message, font=("times new roman", 14), width=30)
         self.message_entry.insert(0, 'Wake Up')
         self.message_entry.place(x=150, y=250)
 
         # Test Button: For testing the ringtone music.
         test_button = tknew.Button(self.window_2, text='Test',
-                             font=('Helvetica', 15), bg="white", fg="black", command=self.test_window)
+                                   font=('Helvetica', 15), bg="white", fg="black", command=self.test_window)
         test_button.place(x=150, y=300)
 
         # The Cancel Button: For cancel the alarm.
         cancel_button = tknew.Button(self.window_2,
-                               text='Cancel', font=('Helvetica', 15), bg="white",
-                               fg="black", command=self.window_2.destroy)
+                                     text='Cancel', font=('Helvetica', 15), bg="white",
+                                     fg="black", command=self.window_2.destroy)
         cancel_button.place(x=390, y=300)
 
         # The Start Button: For set the alarm time
-        start_button =tknew.Button(self.window_2, text='Start',
-                              font=('Helvetica', 15), bg="green", fg="white", command=self.Threading_1)
+        start_button = tknew.Button(self.window_2, text='Start',
+                                    font=('Helvetica', 15), bg="green", fg="white", command=self.Threading_1)
         start_button.place(x=490, y=300)
 
         self.window_2.mainloop()
@@ -192,6 +190,7 @@ class Alarmclock:
         except Exception as es:
             messagebox.showerror("Error!", f"Error due to {es}")
 
+
 """
 # The main function.
 if __name__ == "__main__":
@@ -200,4 +199,3 @@ if __name__ == "__main__":
     obj = Alarmclock(root)
     root.mainloop()
 """
-
