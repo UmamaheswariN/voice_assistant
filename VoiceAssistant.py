@@ -129,7 +129,7 @@ def wishMe():
     assname = ("R 1 point 0")
     talk("Loading your personal assistant")
     talk(assname)
-    talk("confirm your Language by mentioning as follows. English,  Spanish, French, Tamil, Hindi")
+    talk("Please confirm your Language by mentioning the following. English, Spanish, French, Tamil, and Hindi")
     # talk("Tell me how can I help you?")
 
 
@@ -298,8 +298,8 @@ def listen_command(choosenLangCode):
             # adjust the energy threshold based on
             # the surrounding noise level
             listener.adjust_for_ambient_noise(source, duration=0.2)
-            # talk('Tell me how can I help you?..')
-            audio_string = "Tell me how can I help you?"
+            # talk('Tell me how I can assist you.?..')
+            audio_string = "Tell me how I can assist you.?"
             print(audio_string)
             destini_lang = convert_language(audio_string, choosenLangCode)
             print('translated text')
@@ -350,7 +350,7 @@ def listen_trac_command():
             # the surrounding noise level
             listener.adjust_for_ambient_noise(source, duration=0.2)
             # talk('Tell me how can I help you?..')
-            audio_string = "am ready to take your input?"
+            audio_string = "I am eager to hear your suggestions.?"
             print(audio_string)
             talk(audio_string)
             print('listening...')
@@ -1499,7 +1499,7 @@ def run_alexa(choosenLangCode):
         print("-----*-----*-----*-----*-----*-----*")
 """
         # if 'yes' in isconfirm or 's' in isconfirm or 'z' in isconfirm or 'zee' in isconfirm or 'ss' in isconfirm or 'sí' in isconfirm or 'Oui' in isconfirm:
-        accessToken = getAuth()
+        accessToken = getAuthSandbox()
 
         url = ratesURL
 
@@ -1607,7 +1607,7 @@ def run_alexa(choosenLangCode):
         print("-----*-----*-----*-----*-----*-----*")
 
         # if 'yes' in isconfirm or 's' in isconfirm or 'z' in isconfirm or 'zee' in isconfirm or 'ss' in isconfirm or 'sí' in isconfirm or 'Oui' in isconfirm:
-        accessToken = getAuth()
+        accessToken = getAuthSandbox()
 
         url = shipURL
 
@@ -1780,6 +1780,9 @@ def run_alexa(choosenLangCode):
         print("020207021381215 = Picked Up")
         print("403934084723025 = Arrived at FedEx location")
         print("920241085725456 = At local FedEx facility")
+        print("506660055629")
+        print("795794045166") ## today's shipment
+        print("794934850594") #prod track
         print("-----*-----*-----*-----*-----*-----*")
         tracking_number = listen_trac_command()
         audio_tra7 = "I am confirming the details: the given tracking number is"
@@ -1796,7 +1799,7 @@ def run_alexa(choosenLangCode):
         isconfirm = listen_trac_command()
         print(isconfirm)
         if 'yes' in isconfirm or 's' in isconfirm or 'z' in isconfirm or 'zee' in isconfirm or 'ss' in isconfirm or 'sí' in isconfirm or 'Oui' in isconfirm:
-            accessToken = getAuth()
+            accessToken = getAuthSandbox()
 
             url = trackingURL
 
@@ -1804,10 +1807,10 @@ def run_alexa(choosenLangCode):
                 "includeDetailedScans": 1,
                 "associatedType": "STANDARD_MPS",
                 "masterTrackingNumberInfo": {
-                    "shipDateEnd": "2022-04-10",
-                    "shipDateBegin": "2022-04-01",
+                    "shipDateEnd": "2022-06-20",
+                    "shipDateBegin": "2022-06-10",
                     "trackingNumberInfo": {
-                        "trackingNumberUniqueId": "245822~" + tracking_number + "~FDEG",
+                        "trackingNumberUniqueId": "245822~" + tracking_number + "~FEDEX",
                         "carrierCode": "FDXE",
                         "trackingNumber": tracking_number
                     }
@@ -2024,7 +2027,7 @@ def startspeakeithme():
         run_alexa(choosenLangcode)
 
 
-def getAuth():
+def getAuthSandbox():
     print('Fedex track api loading ...')
     # fedex authorization
     authurl = "https://apis-sandbox.fedex.com/oauth/token"
@@ -2040,6 +2043,28 @@ def getAuth():
     accessToken = json.loads(authresponse.text)['access_token']
 
     return accessToken
+    # print(accessToken)
+    # time.sleep(5)
+
+def getAuthProd():
+    print('Fedex track api loading ...')
+    # fedex authorization
+    # authurl = "https://apis-sandbox.fedex.com/oauth/token" # sandbox
+    authurl ="https://apis.fedex.com/oauth/token" #production
+    # payload = "grant_type=client_credentials&client_id=l7c83fd3c68c8049df93b5d72b8274641d&client_secret=2e09a50ac5fc428a9d24a891f919b1a5" #sandbox
+    payload = "grant_type=client_credentials&client_id=l7b1806c4c147e43e38f7da9df054870ef&client_secret=eba5d60fed7c49748bce37abaca99ce5" #production
+    headers = {
+        'Content-Type': "application/x-www-form-urlencoded"
+    }
+    authresponse = requests.request("POST", authurl, data=payload, headers=headers)
+
+    print(authresponse.text)
+
+    # print(json.loads(authresponse.text).get('access_token'))
+   # print(json.loads(authresponse.text)['access_token'])
+    #accessToken = json.loads(authresponse.text).get('access_token')
+
+    return authresponse.text
     # print(accessToken)
     # time.sleep(5)
 
@@ -2062,8 +2087,8 @@ def falseFun():
 
 
 def writeIntoFile(responseData, filename):
-    print("I am going to write this response in the text file")
-    talk("I am going to write this response in the text file")
+    print("This response will be saved in a text file.")
+    talk("This response will be saved in a text file.")
     suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
     filename1 = "_".join([filename, suffix])
     file = open(filename1 + '.txt', 'w')
@@ -2073,9 +2098,9 @@ def writeIntoFile(responseData, filename):
 
 
 def stopspeacking():
-    talk('Please give the review before log off. It will help me to improve my performance.')
+    talk('Please provide feedback before logging out. It will assist me in improving my performance.')
     select_review()
-    talk("Ok , your pc will log off in 10 sec make sure you exit from all applications")
+    talk("Okay, your computer will log off in 10 seconds. Please ensure that you exit all applications.")
     sys.exit()
 
 

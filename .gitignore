@@ -1,0 +1,6 @@
+/cache/*
+/log/*
+/data/sql/*
+venv/*
+/venv/*
+/venv/Lib/*
