@@ -8,7 +8,7 @@ from logging import exception
 from tkinter import *
 import tkinter.messagebox as message
 # from tkinter.ttk import *
-import cv2
+#import cv2
 import gtts as gt
 import json
 import pyautogui
@@ -1167,61 +1167,6 @@ def run_alexa(choosenLangCode):
 
         time.sleep(6)
 
-    elif (('open' in command or 'turn on' in command) and 'camera' in command) or (
-            ('click' in command or 'take' in command) and ('photo' in command or 'pic' in command)):
-        speak("Opening camera")
-        cam = cv2.VideoCapture(0)
-
-        cv2.namedWindow("test")
-
-        img_counter = 0
-        speak('say click, to click photo.....and if you want to turn off the camera, say turn off the camera')
-
-        while True:
-            ret, frame = cam.read()
-            if not ret:
-                print("failed to grab frame")
-                speak('failed to grab frame')
-                break
-            cv2.imshow("test", frame)
-
-            query3 = takeCommand().lower()
-            k = cv2.waitKey(1)
-
-            if 'click' in query3 or ('take' in query3 and 'photo' in query3):
-                speak('Be ready!...... 3.....2........1..........')
-                pyautogui.press('space')
-                img_name = "opencv_frame_{}.png".format(img_counter)
-                cv2.imwrite(img_name, frame)
-                print("{} written!".format(img_name))
-                speak('{} written!'.format(img_name))
-                img_counter += 1
-            elif 'escape' in query3 or 'off' in query3 or 'close' in query3:
-                pyautogui.press('esc')
-                print("Escape hit, closing...")
-                speak('Turning off the camera')
-                break
-            elif k % 256 == 27:
-                # ESC pressed
-                print("Escape hit, closing...")
-                break
-            elif k % 256 == 32:
-
-                # SPACE pressed
-                img_name = "opencv_frame_{}.png".format(img_counter)
-                cv2.imwrite(img_name, frame)
-                print("{} written!".format(img_name))
-                speak('{} written!'.format(img_name))
-                img_counter += 1
-            elif 'exit' in query3 or 'stop' in query3 or 'bye' in query3:
-                speak('Please say, turn off the camera or press escape button before giving any other command')
-            else:
-                speak('I did not understand what did you say or you entered a wrong key.')
-
-        cam.release()
-
-        cv2.destroyAllWindows()
-
     elif there_exists(["log off", "sign out", "log out", "stop", "shut down", "exit", "bye"]):
         talk('Please give the review. It will help me to improve my performance.')
         select_review()
@@ -1301,11 +1246,11 @@ def run_alexa(choosenLangCode):
 
 
     elif there_exists(["fedex rates", "rates", "Rate and Transit times", "Transit times"]):
-        print("I'm glad to be of service, can you please provide me tracking number")
-        talk("I'm glad to be of service on providing rate and transit times, can you please provide me your account number")
+        print("I'm happy to help you with rates and transit times; could you please provide me with your account number??")
+        talk("I'm happy to help you with rates and transit times; could you please provide me with your account number?")
         print("740561073")
         account_number = listen_trac_command()
-        audio_tra7 = "I am confirming the details: the given account number is"
+        audio_tra7 = "I'm verifying the information: the given account number is"
         print(audio_tra7)
         talk(audio_tra7)
         talk(account_number)
@@ -1314,11 +1259,12 @@ def run_alexa(choosenLangCode):
         print(account_number)
         print("-----*-----*-----*-----*-----*-----*")
 
-        talk('could you please specify pickupType?')
+        talk('Could you please specify the type of pickup?')
         print("https://developer.fedex.com/api/en-us/guides/api-reference.html#pickuptypes")
         print("sample as DROPOFF_AT_FEDEX_LOCATION")
-        talk("you can refer the available pickupType from this website")
         webbrowser.open_new_tab("https://developer.fedex.com/api/en-us/guides/api-reference.html#pickuptypes")
+        print("This website lists the available pickupTypes.")
+        talk("This website lists the available pickupTypes.")
         time.sleep(5)
         pickupType1 = listen_trac_command()
         pickupType2 = pickupType1.upper()
@@ -1543,8 +1489,8 @@ def run_alexa(choosenLangCode):
         print("-----*-----*-----*-----*-----*-----*")
         response = requests.request("POST", url, data=payload, headers=headers)
         print(response.text)
-        print('Fedex Rates and transit times Service call in progress..')
-        talk('Please Wait...Fedex Rates and transit times call is in progress..')
+        print('Please Be Patient... The Fedex Rates and Transit Times call is currently in progress.')
+        talk('Please Be Patient... The Fedex Rates and Transit Times call is currently in progress.')
         # responeData = requests.request("POST", fedexReqUrl, data=fedexData, headers=headers)
         print("response.json()...................")
         responseData = response.text
@@ -1553,7 +1499,7 @@ def run_alexa(choosenLangCode):
         # rate_code = json.loads(responseData)['output'][0]['alerts']['code']
         # rate_msg = json.loads(responseData)['output'][0]['alerts']['message']
         if response.status_code == 200:
-            tra_string12 = 'Rates and Transit times Successfully called...And the response which has been received from fedex is'
+            tra_string12 = 'Transit times and rates Called successfully... And the response received from Fedex is'
             print(tra_string12)
             print(responseData)
             writeIntoFile(responseData, "rating")
@@ -1593,11 +1539,11 @@ def run_alexa(choosenLangCode):
         # stopspeacking()
 
     elif there_exists(["fedex shipment", "create shipment", "shipping", "shipment"]):
-        print("Hey uma I am here for you whenever you need us, to complete this request can you please provide me account number to get the status")
-        talk("Hey uma I am here for you whenever you need us, to complete this request  can you please provide me your account number to create shipment")
+        print("Hey uma I am available to you whenever you need us. To complete this request, could you please provide me with your account number so that I can obtain the status?")
+        talk("Hey uma I am available to you whenever you need us. To complete this request, could you please provide me with your account number so that I can obtain the status?")
         print("740561073")
         account_number = listen_trac_command()
-        audio_tra7 = "i just want to confirm the given account number is"
+        audio_tra7 = "I just want to confirm that the account number provided is correct."
         print(audio_tra7)
         talk(audio_tra7)
         talk(account_number)
@@ -1725,8 +1671,8 @@ def run_alexa(choosenLangCode):
         print("-----*-----*-----*-----*-----*-----*")
         response = requests.request("POST", url, data=payload, headers=headers)
         print(response.text)
-        print('Please Wait...Fedex creating shipment call in progress..')
-        talk('Please Wait...Fedex creating shipment call in progress..')
+        print('Please Wait...FedEx is currently creating a shipment call.')
+        talk('Please Wait...FedEx is currently creating a shipment call.')
         # responeData = requests.request("POST", fedexReqUrl, data=fedexData, headers=headers)
         print("response.json()...................")
         responseData = response.text
@@ -1773,8 +1719,8 @@ def run_alexa(choosenLangCode):
             # stopspeacking()
 
     elif there_exists(["fedex tracking","track", "delivery", "where is package", "Shipment details"]):
-        print("Hey It's my pleasure, can you please provide me tracking number to get the status")
-        talk("It's my pleasure, can you please provide me tracking number to get the status")
+        print("It is my pleasure; could you please provide me with a tracking number so that I can check the status?")
+        talk("It is my pleasure; could you please provide me with a tracking number so that I can check the status?")
         print("sample tracking 123456789012/ 858488600850")
         print("122816215025810 = Delivered")
         print("020207021381215 = Picked Up")
@@ -1785,7 +1731,7 @@ def run_alexa(choosenLangCode):
         print("794934850594") #prod track
         print("-----*-----*-----*-----*-----*-----*")
         tracking_number = listen_trac_command()
-        audio_tra7 = "I am confirming the details: the given tracking number is"
+        audio_tra7 = "I'm confirming the details: the tracking number provided is"
         print(audio_tra7)
         talk(audio_tra7)
         talk(tracking_number)
@@ -1793,7 +1739,7 @@ def run_alexa(choosenLangCode):
         tracking_number = re.sub(r'(\d)\s+(\d)', r'\1\2', tracking_number)
         print(tracking_number)
         print("-----*-----*-----*-----*-----*-----*")
-        tra_string11 = "All these details are okay? Shall i proceed to create? please confirm yes or no"
+        tra_string11 = "Are all of these particulars acceptable? Should I start working? Please confirm whether you are a yes or no."
         print(tra_string11)
         talk(tra_string11)
         isconfirm = listen_trac_command()
@@ -1807,8 +1753,8 @@ def run_alexa(choosenLangCode):
                 "includeDetailedScans": 1,
                 "associatedType": "STANDARD_MPS",
                 "masterTrackingNumberInfo": {
-                    "shipDateEnd": "2022-06-20",
-                    "shipDateBegin": "2022-06-10",
+                    "shipDateEnd": "2021-11-03",
+                    "shipDateBegin": "2021-11-01",
                     "trackingNumberInfo": {
                         "trackingNumberUniqueId": "245822~" + tracking_number + "~FEDEX",
                         "carrierCode": "FDXE",
@@ -1909,7 +1855,7 @@ def select_review():
     root3.title("Select an option")
 
     vs = IntVar()
-    string = "Are you satisfied with my performance?"
+    string = "Are you happy with my performance??"
     msgbox = Message(root3, text=string)
     msgbox.config(bg="lightgreen", font="(20)")
     msgbox.grid(row=0, column=0)
@@ -1967,8 +1913,8 @@ def select1():
         type_of_review = "No review"
         root3.destroy()
     try:
-        print('Thanks for your review')
-        talk("Thanks for your review")
+        print('Thank you for your feedback.')
+        talk("Thank you for your feedback.")
         talk("Ok , your pc will log off in 10 sec make sure you exit from all applications")
         sys.exit()
     except Exception as e:
